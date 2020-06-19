@@ -70,3 +70,17 @@ Likewise if you come up with any improvements also please tell me!
 
 
 <img src="https://github.com/kloggy/HA-Irrigation-Version2/blob/master/screenshots/screenshot-v2.jpg">
+
+CHANGES by JP:
+
+- Use switch names properly.
+- Add Evaporation mode via SmartIrrigation Integration (https://github.com/jeroenterheerdt/HASmartIrrigation)
+- In Evaporation mode:
+    - Times are set by % of smart daily irrigation rate.
+    - Evaporation and estimated irrigation shown.
+
+Requisites:
+- SmartIrrigation with auto update disabled.
+- Template sensors:
+    - smart_irrigation_hourly_netto_precipitation
+    - smart_evapotranspiration

@@ -81,4 +81,6 @@ cards:
                   !include templates/garden/settings/rainfall/section_settings_rainfall.yaml
                 temperature:
                   !include templates/garden/settings/temperature/section_settings_temperature.yaml
+                smartirrigation:
+                  !include templates/garden/settings/smartirrigation/section_settings_smartirrigation.yaml
 

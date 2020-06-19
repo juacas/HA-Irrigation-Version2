@@ -28,6 +28,9 @@ input_boolean:
   irrigation_ui_show_temperature_settings:
     name: Temperature
 
+  irrigation_ui_show_smartirrigation_settings:
+    name: Smart Irrigation
+
   #====================================
   #=== Show History and Last Run in UI
   #====================================
@@ -64,6 +67,8 @@ sensor:
             rainfall
           {% elif is_state('input_boolean.irrigation_ui_show_temperature_settings', 'on') %}   
             temperature
+          {% elif is_state('input_boolean.irrigation_ui_show_smartirrigation_settings', 'on') %}   
+            smartirrigation
           {% else %}
             no settings selected
           {% endif %}
@@ -133,8 +138,7 @@ automation:
     action:
       - service: input_boolean.turn_on
         data_template:
-          entity_id: >
-            {{ trigger.entity_id }}
+          entity_id: "{{ trigger.entity_id }}"
 
 
   #========================
@@ -147,6 +151,7 @@ automation:
           - input_boolean.irrigation_ui_show_general_settings
           - input_boolean.irrigation_ui_show_rainfall_settings
           - input_boolean.irrigation_ui_show_temperature_settings
+          - input_boolean.irrigation_ui_show_smartirrigation_settings
         to: 'on'
 
     action:
@@ -155,14 +160,23 @@ automation:
           entity_id: >
             {% if 'general' in trigger.entity_id %}   
               input_boolean.irrigation_ui_show_rainfall_settings,
-              input_boolean.irrigation_ui_show_temperature_settings
+              input_boolean.irrigation_ui_show_temperature_settings,
+              input_boolean.irrigation_ui_show_smartirrigation_settings
             {% elif 'rainfall' in trigger.entity_id %}
               input_boolean.irrigation_ui_show_general_settings,
-              input_boolean.irrigation_ui_show_temperature_settings
+              input_boolean.irrigation_ui_show_temperature_settings,
+              input_boolean.irrigation_ui_show_smartirrigation_settings
+            {% elif 'smartirrigation' in trigger.entity_id %}
+              input_boolean.irrigation_ui_show_general_settings,
+              input_boolean.irrigation_ui_show_temperature_settings,
+              input_boolean.irrigation_ui_show_rainfall_settings
             {% else %}
               input_boolean.irrigation_ui_show_general_settings,
-              input_boolean.irrigation_ui_show_rainfall_settings
+              input_boolean.irrigation_ui_show_rainfall_settings,
+              input_boolean.irrigation_ui_show_smartirrigation_settings
             {% endif %}
+      - service: homeassistant.update_entity
+        entity_id: sensor.smart_irrigation_daily_adjusted_run_time
 
 
   #==============================
@@ -175,6 +189,7 @@ automation:
           - input_boolean.irrigation_ui_show_general_settings
           - input_boolean.irrigation_ui_show_rainfall_settings
           - input_boolean.irrigation_ui_show_temperature_settings
+          - input_boolean.irrigation_ui_show_smartirrigation_settings
         to: 'off'
 
     condition:
@@ -188,6 +203,10 @@ automation:
 
       - condition: state
         entity_id: input_boolean.irrigation_ui_show_temperature_settings
+        state: 'off'
+      
+      - condition: state
+        entity_id: input_boolean.irrigation_ui_show_smartirrigation_settings
         state: 'off'
 
     action:
@@ -208,6 +227,8 @@ automation:
           - input_boolean.irrigation_cycle2_adjust_for_rainfall
           - input_boolean.irrigation_cycle1_adjust_for_temperature
           - input_boolean.irrigation_cycle2_adjust_for_temperature
+          - input_boolean.irrigation_cycle1_adjust_for_smartirrigation
+          - input_boolean.irrigation_cycle2_adjust_for_smartirrigation
         to: 'on'
 
     action:
@@ -216,8 +237,24 @@ automation:
           entity_id: >
             {% if 'rainfall' in trigger.entity_id %}
               input_boolean.irrigation_ui_show_rainfall_settings
-            {% else %}
+            {% elif 'temperature' in trigger.entity_id %}
               input_boolean.irrigation_ui_show_temperature_settings
+            {% elif 'smartirrigation' in trigger.entity_id %}
+              input_boolean.irrigation_ui_show_smartirrigation_settings
+            {% endif %}
+      - service: input_boolean.turn_off
+        data_template:
+          entity_id: >
+            {% if 'cycle1_adjust_for_smartirrigation' in trigger.entity_id %}
+              input_boolean.irrigation_cycle1_adjust_for_rainfall,
+              input_boolean.irrigation_cycle1_adjust_for_temperature
+            {% elif 'cycle2_adjust_for_smartirrigation' in trigger.entity_id  %}
+              input_boolean.irrigation_cycle2_adjust_for_rainfall,
+              input_boolean.irrigation_cycle2_adjust_for_temperature
+            {% elif 'cycle1' in trigger.entity_id  %}
+              input_boolean.irrigation_cycle1_adjust_for_smartirrigation
+            {% elif 'cycle2' in trigger.entity_id  %}
+              input_boolean.irrigation_cycle2_adjust_for_smartirrigation
             {% endif %}
 
   #=== END OF SECTION HEADER SELECTION BUTTONS
@@ -436,3 +473,79 @@ automation:
             
   #=== END OF ZONE DURATION CHANGES
 
+  #==================================================
+  #=== Evaporation Run Time updated
+  #=== Keep input_number slider and box synchronised
+  #==================================================
+  - alias: Evaporation Run Time Synchronisation
+    trigger: 
+      - platform: state
+        entity_id:
+          - sensor.smart_irrigation_daily_adjusted_run_time
+          - sensor.smart_irrigation_hourly_adjusted_run_time
+    action:
+      - service: input_number.set_value
+        data_template:
+          entity_id: >
+            {% if states('input_boolean.irrigation_cycle1_adjust_for_smartirrigation') == 'on' %}
+            input_number.irrigation_cycle1_zone1_duration
+            {% endif %}            
+          value: >
+            {% set evap_runtime = states('sensor.smart_irrigation_daily_adjusted_run_time') | float %}
+            {% set evap_runtime = trigger.to_state.state | float %}
+            {% set ratio = states('input_number.irrigation_zone1_percent_adjust') | float %}
+            {{"%.1f" | format(evap_runtime * ratio /60 /100) }}
+      - service: input_number.set_value
+        data_template:
+          entity_id: >
+            {% if states('input_boolean.irrigation_cycle1_adjust_for_smartirrigation') == 'on' %}
+            input_number.irrigation_cycle1_zone2_duration
+            {% endif %}            
+          value: >
+            {% set evap_runtime = trigger.to_state.state | float %}
+            {% set ratio = states('input_number.irrigation_zone2_percent_adjust') | float %}
+            {{"%.1f" | format(evap_runtime * ratio /60 /100) }}
+      - service: input_number.set_value
+        data_template:
+          entity_id: >
+            {% if states('input_boolean.irrigation_cycle1_adjust_for_smartirrigation') == 'on' %}
+            input_number.irrigation_cycle1_zone3_duration
+            {% endif %}            
+          value: >
+            {% set evap_runtime = trigger.to_state.state | float %}
+            {% set ratio = states('input_number.irrigation_zone3_percent_adjust') | float %}
+            {{"%.1f" | format(evap_runtime * ratio /60 /100) }}
+      ##---------------------
+      #  Cycle 2
+      ##---------------------
+      - service: input_number.set_value
+        data_template:
+          entity_id: >
+            {% if states('input_boolean.irrigation_cycle2_adjust_for_smartirrigation') == 'on' %}
+            input_number.irrigation_cycle2_zone1_duration
+            {% endif %}            
+          value: >
+            {% set evap_runtime = trigger.to_state.state | float %}
+            {% set ratio = states('input_number.irrigation_zone1_percent_adjust') | float %}
+            {{"%.1f" | format(evap_runtime * ratio /60 /100) }}
+      - service: input_number.set_value
+        data_template:
+          entity_id: >
+            {% if states('input_boolean.irrigation_cycle2_adjust_for_smartirrigation') == 'on' %}
+            input_number.irrigation_cycle2_zone2_duration
+            {% endif %}            
+          value: >
+            {% set evap_runtime = trigger.to_state.state | float %}
+            {% set ratio = states('input_number.irrigation_zone2_percent_adjust') | float %}
+            {{"%.1f" | format(evap_runtime * ratio /60 /100) }}
+      - service: input_number.set_value
+        data_template:
+          entity_id: >
+            {% if states('input_boolean.irrigation_cycle2_adjust_for_smartirrigation') == 'on' %}
+            input_number.irrigation_cycle2_zone3_duration
+            {% endif %}            
+          value: >
+            {% set evap_runtime = trigger.to_state.state | float %}
+            {% set ratio = states('input_number.irrigation_zone3_percent_adjust') | float %}
+            {{"%.1f" | format(evap_runtime * ratio /60 /100) }}
+  #=== END OF ZONE DURATION CHANGES

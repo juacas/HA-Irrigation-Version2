@@ -184,11 +184,17 @@ input_boolean:
   irrigation_cycle2_adjust_for_temperature:
     name: Cycle 1 Adjust For Temperature
     icon: mdi:home-thermometer
+    initial: off
 
   irrigation_cycle2_adjust_for_rainfall:
     name: Cycle 2 Adjust For Rainfall
     icon: mdi:weather-rainy
+    initial: off
 
+  irrigation_cycle2_adjust_for_smartirrigation:
+    name: Cycle 2 Adjust For Evaporation
+    icon: mdi:weather-fog
+    initial: on
 
   #=================================
   #=== Days on which to run Cycle 2

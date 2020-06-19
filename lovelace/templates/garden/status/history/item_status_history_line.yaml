@@ -45,6 +45,10 @@ custom_fields:
   total_yesterday: >
     [[[
       var zone = '{{ zone }}';
+      var number_of_zones = Number(states['input_number.irrigation_number_of_zones'].state);
+      var zone_number = Number(zone.substring(4, 5));
+      if (zone_number > number_of_zones){ 
+          return;}
       var time = states['sensor.irrigation_' + zone + '_total_time_yesterday'].attributes.value;
       if(time){
         time = time.replace("h", "hrs ");
@@ -54,6 +58,10 @@ custom_fields:
   total_today: >
     [[[
       var zone = '{{ zone }}';
+      var number_of_zones = Number(states['input_number.irrigation_number_of_zones'].state);
+      var zone_number = Number(zone.substring(4, 5));
+      if (zone_number > number_of_zones){
+          return; }
       var time = states['sensor.irrigation_' + zone + '_total_time_today'].attributes.value;
       if(time){
         time = time.replace("h", "hrs ");

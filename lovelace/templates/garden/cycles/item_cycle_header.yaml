@@ -14,11 +14,9 @@ cards:
         var entity_id = 'input_text.irrigation_cycle{{ cycle }}_name';
         return states[entity_id].state.toUpperCase() + ' SCHEDULE';
       ]]]
-    label: >
-      [[[
-        return states['sensor.dark_sky_current_minutely_summary'] ? 'Weather Outlook: ' + states['sensor.dark_sky_current_minutely_summary'].state.replace(',', ',<br>') : 'DarkSky not configured correctly';
-      ]]]
+    # label: when Evaporation mode the values of the zone are relative durations
     show_label: true
+    # return states['sensor.dark_sky_current_minutely_summary'] ? 'Weather Outlook: ' + states['sensor.dark_sky_current_minutely_summary'].state.replace(',', ',<br>') : 'DarkSky not configured correctly';
     size: 80%
     tap_action:
       action: call-service

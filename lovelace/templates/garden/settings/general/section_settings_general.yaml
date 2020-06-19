@@ -12,7 +12,6 @@ entities:
       #=== Irrigation Master Control and Testing Mode
       - type: horizontal-stack
         cards:
-
           #=== Irrigation Master Control switch
           - !include
             - ../item_settings_check_box_with_entity_icon.yaml
@@ -82,7 +81,7 @@ entities:
       #=== Irigation controller WiFi signal strength
       - !include
           - ../item_settings_line.yaml
-          - entity: sensor.esphome_irrigation_controller_wifi_signal
+          - entity: sensor.irrigation_controller_wifi_signal
             name: Irrigation Controller WiFi Signal Strength
             numeric_state: 'false'
             tap_action: none

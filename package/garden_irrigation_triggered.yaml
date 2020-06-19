@@ -63,12 +63,16 @@ automation:
         value_template: >
           {% set start_time_cycle1 = states('sensor.irrigation_cycle1_start_time_in_seconds') | int %}
           {% set start_time_cycle1 = start_time_cycle1 | timestamp_custom('%H:%M', false) %}
-          {% if states('sensor.time') == start_time_cycle1 %}
+          {% set start_time_cycle2 = states('sensor.irrigation_cycle2_start_time_in_seconds') | int %}
+          {% set start_time_cycle2 = start_time_cycle2 | timestamp_custom('%H:%M', false) %}
+          {% set now = states('sensor.time') %}
+          {% if now == start_time_cycle1 %}
             {% set cycle = 'cycle1' %} 
-          {% else %}
+          {% elif now == start_time_cycle2 %}
             {% set cycle = 'cycle2' %}
+          {% else %}
+            {% set cycle = 'none' %}
           {% endif %}
-
           {% if 'cycle3' in trigger.entity_id %}
             True
           {% elif states('input_boolean.irrigation_' ~ cycle ~ '_schedule_enabled') =='on' %}
@@ -98,12 +102,13 @@ automation:
             False
           {% endif %}
 
-    #===============================================
+    #================================================
     #=== ACTIONS
     #===    Indicate to system that cycle is runing
     #===    Update details of last run
+    #===    Update irrigation daily adjusted run time
     #===    Start the irrigation process
-    #===============================================
+    #================================================
     action:
       #== Set the cycle to be running
       - service: homeassistant.turn_on
@@ -119,7 +124,14 @@ automation:
             {% else %}
               {{ 'input_boolean.irrigation_cycle2_running' }}
             {% endif %}
-
+      #==================================================
+      # Update Smart Irrigation for the day
+      #==================================================            
+      - service: smart_irrigation.smart_irrigation_calculate_daily_adjusted_run_time
+      #==================================================
+      # Wait 5 seconds to calculate irrigation
+      #==================================================
+      - delay: '00:00:05'
       #===================================================
       #=== SET DETAILS OF LAST RUN FOR THE STATUS SECTION
       #===================================================

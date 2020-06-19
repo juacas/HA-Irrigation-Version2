@@ -316,7 +316,7 @@ automation:
       - service: input_text.set_value
         data:
           entity_id: input_text.irrigation_zone1_switch_entity_id
-          value: switch.zone1
+          value: 'unknown'
 
   #============================
   #=== Zone 2 Switch Entity ID
@@ -335,7 +335,7 @@ automation:
       - service: input_text.set_value
         data:
           entity_id: input_text.irrigation_zone2_switch_entity_id
-          value: switch.zone2
+          value: none
 
   #============================
   #=== Zone 3 Switch Entity ID
@@ -354,7 +354,7 @@ automation:
       - service: input_text.set_value
         data:
           entity_id: input_text.irrigation_zone3_switch_entity_id
-          value: switch.zone3
+          value: none
 
   #============================
   #=== Zone 4 Switch Entity ID
@@ -373,7 +373,7 @@ automation:
       - service: input_text.set_value
         data:
           entity_id: input_text.irrigation_zone4_switch_entity_id
-          value: switch.zone4
+          value: none
 
   #============================
   #=== Zone 5 Switch Entity ID
@@ -392,7 +392,7 @@ automation:
       - service: input_text.set_value
         data:
           entity_id: input_text.irrigation_zone5_switch_entity_id
-          value: switch.zone5
+          value: none
 
   #============================
   #=== Zone 6 Switch Entity ID
@@ -411,7 +411,7 @@ automation:
       - service: input_text.set_value
         data:
           entity_id: input_text.irrigation_zone6_switch_entity_id
-          value: switch.zone6
+          value: none
 
   #============================
   #=== Zone 7 Switch Entity ID
@@ -430,7 +430,7 @@ automation:
       - service: input_text.set_value
         data:
           entity_id: input_text.irrigation_zone7_switch_entity_id
-          value: switch.zone7
+          value: none
 
   #============================
   #=== Zone 8 Switch Entity ID
@@ -449,6 +449,6 @@ automation:
       - service: input_text.set_value
         data:
           entity_id: input_text.irrigation_zone8_switch_entity_id
-          value: switch.zone8
+          value: none
 
 

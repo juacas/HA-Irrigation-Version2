@@ -25,7 +25,7 @@ label: >
     var total_seconds = start_time + duration;
 
     end_time.setSeconds(total_seconds);
-    
+    return "<br>Duration " + duration;
     return "<br>(Will end about " + end_time.toISOString().substr(11, 5) + ")";    
   ]]]
 color: var(--paper-item-icon-active-color)

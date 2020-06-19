@@ -1,0 +1,31 @@
+
+#===============================================
+#=== Forecast vs. Actual High Temperature Graph
+#===============================================
+type: custom:mini-graph-card
+entities:
+  - entity: sensor.smart_irrigation_daily_adjusted_run_time
+    color: IndianRed
+    show_legend: true
+  - entity: sensor.smart_irrigation_hourly_adjusted_run_time
+    color: SteelBlue
+    show_legend: true
+line_width: 2
+hours_to_show: 24
+points_per_hour: 8
+# aggregate_func: avg
+show:
+  name: true
+  state: true
+  labels: true
+  labels_secondary: true
+  icon: false
+tap_action:
+  action: none
+style: >
+  ha-card {
+    box-shadow: none;
+    background: none;
+    border-radius: 0px;
+  }
+

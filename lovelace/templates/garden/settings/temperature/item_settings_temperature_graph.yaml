@@ -23,7 +23,7 @@ points_per_hour: 4
 aggregate_func: min
 show:
   name: false
-  state: false
+  state: true
   labels: true
   labels_secondary: false
   icon: false

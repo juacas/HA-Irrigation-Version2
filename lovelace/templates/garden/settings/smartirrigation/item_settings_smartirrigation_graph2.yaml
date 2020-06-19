@@ -1,0 +1,40 @@
+
+#===============================================
+#=== Forecast vs. Actual High Temperature Graph
+#===============================================
+type: custom:mini-graph-card
+entities:
+  # - entity: sensor.aemet_humidity
+  #   name: Humidity
+  - entity: sensor.aemet_temperature
+    name: Temperature
+  - entity: sensor.aemet_precipitation
+    name: Precipitation
+    y_axis: secondary
+  - entity: sensor.smart_irrigation_hourly_netto_precipitation
+    name: NETTO
+    y_axis: secondary
+    color: black
+  - entity: sensor.smart_evapotranspiration
+    name: Evaporation
+    y_axis: secondary
+    color: black
+line_width: 2
+hours_to_show: 24
+points_per_hour: 8
+# aggregate_func: avg
+show:
+  name: true
+  state: true
+  labels: true
+  labels_secondary: true
+  icon: false
+tap_action:
+  action: none
+style: >
+  ha-card {
+    box-shadow: none;
+    background: none;
+    border-radius: 0px;
+  }
+

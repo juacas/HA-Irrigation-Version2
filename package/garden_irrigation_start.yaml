@@ -59,7 +59,7 @@ script:
   #===  zone  - [zone1, zone2, ... zone8]
   #=============================================================
   irrigation_start_zone:
-    description: Irrigartion Start A Zone
+    description: Irrigation Start A Zone
     fields: 
       cycle:
         description: Cycle to run
@@ -92,7 +92,7 @@ script:
             {% if is_state('switch.garden_irrigation_relay_' ~ zone, 'unavailable') %}
               none
             {% else %}
-              switch.garden_irrigation_relay_{{ zone }}
+              {{ states('input_text.irrigation_' ~ zone ~ '_switch_entity_id') }}
             {% endif %}
 
 
@@ -186,7 +186,13 @@ script:
         data:
           entity_id: input_text.irrigation_current_status
           value: SYSTEM IDLE
-
+      - service_template: >
+          {%- if states('input_boolean.irrigation_' ~ cycle ~ '_adjust_for_smartirrigation') == 'on' -%}
+          smart_irrigation.smart_irrigation_reset_bucket
+          {%- else -%}
+          # Do Nothing
+          {%- endif -%}
+        
 
   #=========================================
   #=== Start A Timer Unless zone is skipped
@@ -197,7 +203,7 @@ script:
   #===  duration - in seconds
   #=========================================
   irrigation_start_timer:
-    description: Irrigation Start A Timer Unless zone is skipped
+    description: Irrigation Start A Timer Unless zone is skipped or switch is none
     fields: 
       cycle:
         description: Cycle to run
@@ -210,10 +216,10 @@ script:
         example: 120
 
     sequence:
-      #=== If zone is skipped then duration is zero
+      #=== If zone is skipped then duration is zero or switch is not configured
       - condition: template
         value_template: >
-          {{ duration != '0' }}
+          {{ duration != '0' and states('input_text.irrigation_' ~ zone ~ '_switch_entity_id') != 'unknown' }}
 
       #=== Update Status with Zone being watered
       - service: input_text.set_value
@@ -238,7 +244,8 @@ script:
 
       #=== Start watering
       - service: switch.turn_on
+        # entity_id: switch.bf40f267638034d624qcc6
         data_template:
           entity_id: >
             {{ states('input_text.irrigation_' ~ zone ~ '_switch_entity_id') }}
-
+            

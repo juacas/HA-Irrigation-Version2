@@ -51,6 +51,8 @@ card:
                       name: Zone Name
                     - entity: input_text.irrigation_zone{{ zone }}_switch_entity_id
                       name: Switch Name
+                    - entity: input_number.irrigation_zone{{ zone }}_percent_adjust
+                      name: Percent Evaporation
                 deviceID:
                   - this
                 style:
