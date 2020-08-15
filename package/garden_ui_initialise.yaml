@@ -316,8 +316,8 @@ automation:
       - service: input_text.set_value
         data:
           entity_id: input_text.irrigation_zone1_switch_entity_id
-          value: 'unknown'
-
+          value: none
+          
   #============================
   #=== Zone 2 Switch Entity ID
   #============================

@@ -24,7 +24,7 @@ timer:
 #=== Input Numbers
 #==================
 input_number:
-  irrigation_number_of_zones: 
+  irrigation_number_of_zones:
     name: Number of Zones
     min: 1
     max: 8
@@ -64,53 +64,53 @@ input_text:
   #=======================
   #=== Previous Durations
   #=======================
-  irrigation_zone1_previous_duration_in_seconds: 
+  irrigation_zone1_previous_duration_in_seconds:
     name: Zone 1 Previous Duration
     min: 1
     max: 40
-    icon: mdi:timer
+    icon: mdi:timer-outline
 
-  irrigation_zone2_previous_duration_in_seconds: 
+  irrigation_zone2_previous_duration_in_seconds:
     name: Zone 2 Previous Duration
     min: 1
     max: 40
-    icon: mdi:timer
+    icon: mdi:timer-outline
 
-  irrigation_zone3_previous_duration_in_seconds: 
+  irrigation_zone3_previous_duration_in_seconds:
     name: Zone 3 Previous Duration
     min: 1
     max: 40
-    icon: mdi:timer
+    icon: mdi:timer-outline
 
-  irrigation_zone4_previous_duration_in_seconds: 
+  irrigation_zone4_previous_duration_in_seconds:
     name: Zone 4 Previous Duration
     min: 1
     max: 40
-    icon: mdi:timer
+    icon: mdi:timer-outline
 
-  irrigation_zone5_previous_duration_in_seconds: 
+  irrigation_zone5_previous_duration_in_seconds:
     name: Zone 5 Previous Duration
     min: 1
     max: 40
-    icon: mdi:timer
+    icon: mdi:timer-outline
 
-  irrigation_zone6_previous_duration_in_seconds: 
+  irrigation_zone6_previous_duration_in_seconds:
     name: Zone 6 Previous Duration
     min: 1
     max: 40
-    icon: mdi:timer
+    icon: mdi:timer-outline
 
-  irrigation_zone7_previous_duration_in_seconds: 
+  irrigation_zone7_previous_duration_in_seconds:
     name: Zone 7 Previous Duration
     min: 1
     max: 40
-    icon: mdi:timer
+    icon: mdi:timer-outline
 
-  irrigation_zone8_previous_duration_in_seconds: 
+  irrigation_zone8_previous_duration_in_seconds:
     name: Zone 8 Previous Duration
     min: 1
     max: 40
-    icon: mdi:timer
+    icon: mdi:timer-outline
 
   #==================
   #=== Name of Zones
@@ -215,64 +215,19 @@ input_text:
     max: 50
     icon: mdi:alphabetical-variant
 
-#============
-#=== Sensors see /config/sensors/garden2sensors.yaml
-#============
-
-sensor:
-# Sensors
-# - platform: darksky
-#   api_key: !secret darksky_api_key
-#   forecast:
-#     - 0
-#   monitored_conditions:
-#     - temperature_high           
-#     - minutely_summary
-  - platform: template
-    sensors:
-      weather_just_icon:
-        friendly_name: "mdi Real Weather Icon"
-        icon_template: >-
-            {% if is_state("sensor.dark_sky_current_icon","clear-day") %} mdi:weather-sunny 
-            {% elif is_state("sensor.dark_sky_current_icon","clear-night") %} mdi:weather-night 
-            {% elif is_state("sensor.dark_sky_current_icon","rain") %} mdi:weather-rainy
-            {% elif is_state("sensor.dark_sky_current_icon","snow") %} mdi:weather-snowy
-            {% elif is_state("sensor.dark_sky_current_icon","fog") %} mdi:weather-fog
-            {% elif is_state("sensor.dark_sky_current_icon","sleet") %} mdi:weather-partly-snowy-rainy
-            {% elif is_state("sensor.dark_sky_current_icon","wind") %} mdi:weather-windy
-            {% elif is_state("sensor.dark_sky_current_icon","cloudy") %} mdi:weather-cloudy
-            {% elif is_state("sensor.dark_sky_current_icon","partly-cloudy-day") %} mdi:weather-partly-cloudy
-            {% elif is_state("sensor.dark_sky_current_icon","partly-cloudy-night") %} mdi:weather-night-partly-cloudy
-            {% elif is_state("sensor.dark_sky_current_icon","hail") %} mdi:weather-hail
-            {% elif is_state("sensor.dark_sky_current_icon","lightning") %} mdi:weather-lightning
-            {% elif is_state("sensor.dark_sky_current_icon","thunderstorm") %} mdi:weather-lightning-rainy
-            {% endif %}
-        value_template: >-
-            {% if is_state("sensor.dark_sky_current_icon","clear-day") %} weather-sunny 
-            {% elif is_state("sensor.dark_sky_current_icon","clear-night") %} weather-night 
-            {% elif is_state("sensor.dark_sky_current_icon","rain") %} weather-rainy
-            {% elif is_state("sensor.dark_sky_current_icon","snow") %} weather-snowy
-            {% elif is_state("sensor.dark_sky_current_icon","fog") %} weather-fog
-            {% elif is_state("sensor.dark_sky_current_icon","sleet") %} weather-partly-snowy-rainy
-            {% elif is_state("sensor.dark_sky_current_icon","wind") %} weather-windy
-            {% elif is_state("sensor.dark_sky_current_icon","cloudy") %} weather-cloudy
-            {% elif is_state("sensor.dark_sky_current_icon","partly-cloudy-day") %} weather-partly-cloudy
-            {% elif is_state("sensor.dark_sky_current_icon","partly-cloudy-night") %} weather-night-partly-cloudy
-            {% elif is_state("sensor.dark_sky_current_icon","hail") %} weather-hail
-            {% elif is_state("sensor.dark_sky_current_icon","lightning") %} weather-lightning
-            {% elif is_state("sensor.dark_sky_current_icon","thunderstorm") %} weather-lightning-rainy
-            {% endif %}
-#=======================================================
-#=== SmartWeather (See the readme for more information)
-#======================================================
+#=========================================================
+#=== Sensors mapped to /config/sensors/garden2sensors.yaml
+#=== for local customization.
+#=== it must define the following sensors:
+#=========================================================
+# - platform: history_stats
+#   name: irrigation_zoneN_total_time_today
+# - platform: template
+#     sensors:
+#       weather_just_icon:
+#       smartweather_average_rain_today:
+#       dark_sky_current_temperature:
+#       irrigation_controller_wifi_signal:
 # - platform: rest
-#   resource: !secret smartweather_resource_1
-#   name: smartweather_1
-#   value_template: >
-#     {{ value_json.station_id }}
-#   json_attributes:
-#     - status
-#     - station_units
-#     - obs    
-#   scan_interval:
-#     minutes: 60  
+#   name: smartweather_N
+#========================================================

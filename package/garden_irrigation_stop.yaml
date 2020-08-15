@@ -3,16 +3,16 @@
 #=== Scripts
 #============
 script:
-  
+
   #====================================
   #=== Stop Irrigation
   #===
   #=== Passed [cycle1, cycle2, cycle3]
   #===        [zone1, zone2 ... zone8]
-  #==================================== 
+  #====================================
   irrigation_stop_irrigation:
     description: Stop Irrigation
-    fields: 
+    fields:
       cycle:
         description: Cycle to stop
         example: cycle1
@@ -29,21 +29,22 @@ script:
       #=== Turn off script (because it has a delay)
       - service: script.turn_off
         entity_id: script.irrigation_start_zone
-
-      #=== Turn off all zone valves explicitly 
+      - service: script.turn_off
+        entity_id: script.irrigation_irrigate_a_zone
+      #=== Turn off all zone valves explicitly
       - service: switch.turn_off
         data_template:
-          entity_id: > 
+          entity_id: >
             {% for switch_name in states.input_text
                 if switch_name.object_id.startswith('irrigation_zone')
                   and switch_name.object_id.endswith('switch_entity_id') -%}
                       {% if states(switch_name.state) == 'unknown' -%}
-                          {#{ 'switch.irrigation_dummy_switch' ~ loop.index }#}          
+                          {#{ 'switch.irrigation_dummy_switch' ~ loop.index }#}
                         {%- else %}
                           {%- if loop.index > 1 %}, {% endif -%}
                           {{ switch_name.state }}
                         {%- endif %}
-                        
+
                       {%- endfor %}
 
       #=== Update Status to Idle
@@ -105,5 +106,3 @@ script:
         data_template:
           entity_id: >
             timer.irrigation_{{ zone }}_timer
-
-

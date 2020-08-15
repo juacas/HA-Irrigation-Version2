@@ -7,56 +7,56 @@ input_number:
   #=====================================
   #=== Cycle 2 zone durations (Sliders)
   #=====================================
-  irrigation_cycle2_zone1_duration: 
+  irrigation_cycle2_zone1_duration:
     name: Cycle 2 Zone1 Duration
     min: 0
     max: 60
     unit_of_measurement: min
     icon: mdi:numeric-1-box-outline
 
-  irrigation_cycle2_zone2_duration: 
+  irrigation_cycle2_zone2_duration:
     name: Cycle 2 Zone2 Duration
     min: 0
     max: 60
     unit_of_measurement: min
     icon: mdi:numeric-2-box-outline
 
-  irrigation_cycle2_zone3_duration: 
+  irrigation_cycle2_zone3_duration:
     name: Cycle 2 Zone3 Duration
     min: 0
     max: 60
     unit_of_measurement: min
     icon: mdi:numeric-3-box-outline
 
-  irrigation_cycle2_zone4_duration: 
+  irrigation_cycle2_zone4_duration:
     name: Cycle 2 Zone4 Duration
     min: 0
     max: 60
     unit_of_measurement: min
     icon: mdi:numeric-4-box-outline
 
-  irrigation_cycle2_zone5_duration: 
+  irrigation_cycle2_zone5_duration:
     name: Cycle 2 Zone5 Duration
     min: 0
     max: 60
     unit_of_measurement: min
     icon: mdi:numeric-5-box-outline
 
-  irrigation_cycle2_zone6_duration: 
+  irrigation_cycle2_zone6_duration:
     name: Cycle 2 Zone6 Duration
     min: 0
     max: 60
     unit_of_measurement: min
     icon: mdi:numeric-6-box-outline
 
-  irrigation_cycle2_zone7_duration: 
+  irrigation_cycle2_zone7_duration:
     name: Cycle 2 Zone7 Duration
     min: 0
     max: 60
     unit_of_measurement: min
     icon: mdi:numeric-7-box-outline
 
-  irrigation_cycle2_zone8_duration: 
+  irrigation_cycle2_zone8_duration:
     name: Cycle 2 Zone8 Duration
     min: 0
     max: 60
@@ -66,7 +66,7 @@ input_number:
   #=========================================
   #=== Cycle 2 zone durations (Input Boxes)
   #=========================================
-  irrigation_cycle2_zone1_duration_box: 
+  irrigation_cycle2_zone1_duration_box:
     name: Cycle 2 Zone 1 Duration
     min: 0
     max: 60
@@ -74,7 +74,7 @@ input_number:
     unit_of_measurement: min
     icon: mdi:numeric-1-box-outline
 
-  irrigation_cycle2_zone2_duration_box: 
+  irrigation_cycle2_zone2_duration_box:
     name: Cycle 2 Zone 2 Duration
     min: 0
     max: 60
@@ -82,7 +82,7 @@ input_number:
     unit_of_measurement: min
     icon: mdi:numeric-2-box-outline
 
-  irrigation_cycle2_zone3_duration_box: 
+  irrigation_cycle2_zone3_duration_box:
     name: Cycle 2 Zone 3 Duration
     min: 0
     max: 60
@@ -90,7 +90,7 @@ input_number:
     unit_of_measurement: min
     icon: mdi:numeric-3-box-outline
 
-  irrigation_cycle2_zone4_duration_box: 
+  irrigation_cycle2_zone4_duration_box:
     name: Cycle 2 Zone 4 Duration
     min: 0
     max: 60
@@ -98,7 +98,7 @@ input_number:
     unit_of_measurement: min
     icon: mdi:numeric-4-box-outline
 
-  irrigation_cycle2_zone5_duration_box: 
+  irrigation_cycle2_zone5_duration_box:
     name: Cycle 2 Zone 5 Duration
     min: 0
     max: 60
@@ -106,7 +106,7 @@ input_number:
     unit_of_measurement: min
     icon: mdi:numeric-5-box-outline
 
-  irrigation_cycle2_zone6_duration_box: 
+  irrigation_cycle2_zone6_duration_box:
     name: Cycle 2 Zone 6 Duration
     min: 0
     max: 60
@@ -114,7 +114,7 @@ input_number:
     unit_of_measurement: min
     icon: mdi:numeric-6-box-outline
 
-  irrigation_cycle2_zone7_duration_box: 
+  irrigation_cycle2_zone7_duration_box:
     name: Cycle 2 Zone 7 Duration
     min: 0
     max: 60
@@ -122,7 +122,7 @@ input_number:
     unit_of_measurement: min
     icon: mdi:numeric-7-box-outline
 
-  irrigation_cycle2_zone8_duration_box: 
+  irrigation_cycle2_zone8_duration_box:
     name: Cycle 2 Zone 8 Duration
     min: 0
     max: 60
@@ -279,9 +279,10 @@ sensor:
         friendly_name: Cycle 2 Start Time In Seconds
         value_template: >
           {{ state_attr('input_datetime.irrigation_cycle2_start_time', 'timestamp') }}
-        
+
       #=== Cycle 2 Duration In Seconds
       irrigation_cycle2_duration_in_seconds:
+        unit_of_measurement: 's'
         friendly_name: Cycle 2 Duration In Seconds
         value_template: >
           {{
@@ -297,6 +298,7 @@ sensor:
 
       #=== Actual Zone durations in seconds
       irrigation_cycle2_zone1_actual_duration_in_seconds:
+        unit_of_measurement: 's'
         friendly_name: Cycle 2 Zone 1 Actual Duration In Seconds
         value_template: >
           {% set duration_secs = states('input_number.irrigation_cycle2_zone1_duration') | float * 60 %}
@@ -333,6 +335,7 @@ sensor:
           {% endif %}
 
       irrigation_cycle2_zone2_actual_duration_in_seconds:
+        unit_of_measurement: 's'
         friendly_name: Cycle 2 Zone 2 Actual Duration In Seconds
         value_template: >
           {% set duration_secs = states('input_number.irrigation_cycle2_zone2_duration') | float * 60 %}
@@ -369,6 +372,7 @@ sensor:
           {% endif %}
 
       irrigation_cycle2_zone3_actual_duration_in_seconds:
+        unit_of_measurement: 's'
         friendly_name: Cycle 2 Zone 3 Actual Duration In Seconds
         value_template: >
           {% set duration_secs = states('input_number.irrigation_cycle2_zone3_duration') | float * 60 %}
@@ -405,6 +409,7 @@ sensor:
           {% endif %}
 
       irrigation_cycle2_zone4_actual_duration_in_seconds:
+        unit_of_measurement: 's'
         friendly_name: Cycle 2 Zone 4 Actual Duration In Seconds
         value_template: >
           {% set duration_secs = states('input_number.irrigation_cycle2_zone4_duration') | float * 60 %}
@@ -441,6 +446,7 @@ sensor:
           {% endif %}
 
       irrigation_cycle2_zone5_actual_duration_in_seconds:
+        unit_of_measurement: 's'
         friendly_name: Cycle 2 Zone 5 Actual Duration In Seconds
         value_template: >
           {% set duration_secs = states('input_number.irrigation_cycle2_zone5_duration') | float * 60 %}
@@ -477,6 +483,7 @@ sensor:
           {% endif %}
 
       irrigation_cycle2_zone6_actual_duration_in_seconds:
+        unit_of_measurement: 's'
         friendly_name: Cycle 2 Zone 6 Actual Duration In Seconds
         value_template: >
           {% set duration_secs = states('input_number.irrigation_cycle2_zone6_duration') | float * 60 %}
@@ -513,6 +520,7 @@ sensor:
           {% endif %}
 
       irrigation_cycle2_zone7_actual_duration_in_seconds:
+        unit_of_measurement: 's'
         friendly_name: Cycle 2 Zone 7 Actual Duration In Seconds
         value_template: >
           {% set duration_secs = states('input_number.irrigation_cycle2_zone7_duration') | float * 60 %}
@@ -549,6 +557,7 @@ sensor:
           {% endif %}
 
       irrigation_cycle2_zone8_actual_duration_in_seconds:
+        unit_of_measurement: 's'
         friendly_name: Cycle 2 Zone 8 Actual Duration In Seconds
         value_template: >
           {% set duration_secs = states('input_number.irrigation_cycle2_zone8_duration') | float * 60 %}
@@ -583,4 +592,3 @@ sensor:
               {{ duration_secs | round() }}
             {% endif %}
           {% endif %}
-
