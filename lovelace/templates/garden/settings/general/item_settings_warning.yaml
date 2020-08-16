@@ -1,5 +1,8 @@
+# lovelace_gen
 
-#=== Testing mode warning
+#=========================
+#=== SETTINGS WARNING
+#=========================
 type: horizontal-stack
 cards:
 
@@ -11,7 +14,7 @@ cards:
         - background-color: transparent
         - display: >
             [[[
-              if (states['input_boolean.irrigation_testing_mode'].state != 'on')
+              if (states['{{ entity }}'].state != 'on')
                 return 'none';
             ]]]
 
@@ -19,8 +22,8 @@ cards:
     entity: input_boolean.irrigation_testing_mode
     name: >
       [[[
-        if (entity.state == 'on')
-          return 'Warning! Testing mode converts run<br>times from minutes to seconds';
+        if (states['{{ entity }}'].state == 'on')
+          return '{{ name }}';
       ]]]
     styles:
       grid:
@@ -30,17 +33,18 @@ cards:
       card:
         - display: >
             [[[
-              if (entity.state != 'on')
+              if (states['{{ entity }}'].state != 'on')
                 return 'none';
               else return null;
             ]]]
         - height: 2.5em
+        - font-family: "[[[ return states['input_text.irrigation_ui_font_family'].state ]]]"
         - font-size: 12px
         - box-shadow: none
         - background-color: transparent
-        - padding: 0em 1em 0.2em
+        - padding: 0em 1em 0em
         - margin-top: 0em
-        - margin-bottom: 0.5em
+        - margin-bottom: 0em
       name:
         - color: var(--secondary-text-color)
     state:

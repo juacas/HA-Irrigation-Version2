@@ -19,10 +19,10 @@ script:
       #========================================================================
       - service_template: >
           {% if is_state('input_boolean.irrigation_master_control_switch', 'off') or
-                is_state('input_boolean.cycle1_running', 'on') or
-                is_state('input_boolean.cycle2_running', 'on') %}
+                is_state('input_boolean.irrigation_cycle1_running', 'on') or
+                is_state('input_boolean.irrigation_cycle2_running', 'on') %}
             script.irrigation_dash_not_started
-          {% elif is_state('input_boolean.cycle3_running', 'on') %}
+          {% elif is_state('input_boolean.irrigation_cycle3_running', 'on') %}
             script.irrigation_dash_stop_irrigation
           {% else %}
             script.irrigation_dash_start_irrigation
@@ -65,8 +65,7 @@ script:
 
       #=== Start Cycle 3
       - service: input_boolean.turn_on
-        data:
-          entity_id: input_boolean.irrigation_cycle3_running
+        entity_id: input_boolean.irrigation_cycle3_running
 
       #=== Wait until it has finished
       - wait_template: >
@@ -74,26 +73,26 @@ script:
 
       #=== Restore achedule states
       - service: scene.turn_on
-        data:
-          entity_id: scene.dash_irrigation_scene
+        entity_id: scene.dash_irrigation_scene
 
 
   #========================================================
   #=== Script to stop irrigation when DASH button pressed
-  #===   This stops any cycle even if it was not initiated
-  #===   by the dash button
   #========================================================
   irrigation_dash_stop_irrigation:
     sequence:
+      #=== If Cycle 3 is running
+      - condition: state
+        entity_id: input_boolean.irrigation_cycle3_running
+        state: 'on'
+
+      #=== Turn off Cycle 3
       - service: input_boolean.turn_off
-        data:
-          entity_id:
-            - input_boolean.irrigation_cycle3_running
+        entity_id: input_boolean.irrigation_cycle3_running
     
       #=== Restore achedule states
       - service: scene.turn_on
-        data:
-          entity_id: scene.dash_irrigation_scene
+        entity_id: scene.dash_irrigation_scene
 
 
   #================================================================

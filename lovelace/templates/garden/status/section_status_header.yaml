@@ -5,8 +5,7 @@
 type: entities
 entities:
 
-  - type: custom:hui-element
-    row_type: divider
+  - type: divider
 
   - type: custom:hui-element
     card_type: horizontal-stack
@@ -14,16 +13,71 @@ entities:
       #=== NEXT RUN DETAILS
       - type: custom:button-card
         entity: input_text.irrigation_current_status
+        triggers_update:
+          - group.irrigation_group_cycle1_every_day
+          - group.irrigation_group_cycle1_mon
+          - group.irrigation_group_cycle1_tue
+          - group.irrigation_group_cycle1_wed
+          - group.irrigation_group_cycle1_thu
+          - group.irrigation_group_cycle1_fri
+          - group.irrigation_group_cycle1_sat
+          - group.irrigation_group_cycle1_sun
+
+          - group.irrigation_group_cycle2_every_day
+          - group.irrigation_group_cycle2_mon
+          - group.irrigation_group_cycle2_tue
+          - group.irrigation_group_cycle2_wed
+          - group.irrigation_group_cycle2_thu
+          - group.irrigation_group_cycle2_fri
+          - group.irrigation_group_cycle2_sat
+          - group.irrigation_group_cycle2_sun
         name: >
           [[[
             if (states['input_boolean.irrigation_master_control_switch'].state == 'off')
               return 'SYSTEM IS OFF';
             else
+              var today = new Date();
+              var weekday = new Array(7);
+              weekday[0] = "sun";
+              weekday[1] = "mon";
+              weekday[2] = "tue";
+              weekday[3] = "wed";
+              weekday[4] = "thu";
+              weekday[5] = "fri";
+              weekday[6] = "sat";
+
+              var day_today = weekday[today.getDay()];
+              var day_tomorrow = weekday[(today.getDay() + 1) % 7];
+
+              if (states['group.irrigation_group_cycle1_every_day'].state == 'on' ||
+                  states['group.irrigation_group_cycle1_' + day_today].state == 'on')
+                var cycle1_runs_today = true;
+              else
+                var cycle1_runs_today = false;
+
+              if (states['group.irrigation_group_cycle2_every_day'].state == 'on' ||
+                  states['group.irrigation_group_cycle2_' + day_today].state == 'on')
+                var cycle2_runs_today = true;
+              else
+                var cycle2_runs_today = false;
+
+              if (states['group.irrigation_group_cycle1_every_day'].state == 'on' ||
+                  states['group.irrigation_group_cycle1_' + day_tomorrow].state == 'on')
+                var cycle1_runs_tomorrow = true;
+              else
+                var cycle1_runs_tomorrow = false;
+
+              if (states['group.irrigation_group_cycle2_every_day'].state == 'on' ||
+                  states['group.irrigation_group_cycle2_' + day_tomorrow].state == 'on')
+                var cycle2_runs_tomorrow = true;
+              else
+                var cycle2_runs_tomorrow = false;
+
               var time_now = states['sensor.time'].state;
-              var cycle1_sched = states['input_boolean.irrigation_cycle1_schedule_enabled'].state;
-              var cycle2_sched = states['input_boolean.irrigation_cycle2_schedule_enabled'].state;
-              var cycle1_time = states['input_datetime.irrigation_cycle1_start_time'].state.substr(0, 5);
-              var cycle2_time = states['input_datetime.irrigation_cycle2_start_time'].state.substr(0, 5);
+              var cycle1_schedule_enabled = states['input_boolean.irrigation_cycle1_schedule_enabled'].state;
+              var cycle2_schedule_enabled = states['input_boolean.irrigation_cycle2_schedule_enabled'].state;
+              var cycle1_start_time = states['input_datetime.irrigation_cycle1_start_time'].state.substr(0, 5);
+              var cycle2_start_time = states['input_datetime.irrigation_cycle2_start_time'].state.substr(0, 5);
               var cycle1_name = states['input_text.irrigation_cycle1_name'].state;
               var cycle2_name = states['input_text.irrigation_cycle2_name'].state;
               var cycle3_name = states['input_text.irrigation_cycle3_name'].state;
@@ -38,14 +92,14 @@ entities:
                 return cycle2_name;
               else if (cycle3_running == 'on')
                 return cycle3_name;
-              else if (cycle1_sched == 'on' && cycle1_time > time_now)
-                  return cycle1_name + ' at ' + cycle1_time;
-              else if (cycle2_sched == 'on' && cycle2_time > time_now)
-                  return cycle2_name + ' at ' + cycle2_time;
-              else if (cycle1_sched == 'on' && cycle1_time < time_now)
-                  return 'Tomorrow at ' + cycle1_time;
-              else if (cycle2_sched == 'on' && cycle2_time < time_now)
-                  return 'Tomorrow at ' + cycle2_time;
+              else if (cycle1_schedule_enabled == 'on' && cycle1_runs_today && cycle1_start_time > time_now)
+                  return cycle1_name + ' at ' + cycle1_start_time;
+              else if (cycle2_schedule_enabled == 'on' && cycle2_runs_today && cycle2_start_time > time_now)
+                  return cycle2_name + ' at ' + cycle2_start_time;
+              else if (cycle1_schedule_enabled == 'on' && cycle1_runs_tomorrow && cycle1_start_time < time_now)
+                  return 'Tomorrow at ' + cycle1_start_time;
+              else if (cycle2_schedule_enabled == 'on' && cycle2_runs_tomorrow && cycle2_start_time < time_now)
+                  return 'Tomorrow at ' + cycle2_start_time;
               else return 'NOTHING SCHEDULED';
           ]]]
         label: >
@@ -70,7 +124,8 @@ entities:
             [[[
               if (states['binary_sensor.irrigation_cycle_start_clash'].state == 'on')
                 return 'call-service';
-              else return 'none';
+              else
+                return 'none';
             ]]]
           service: browser_mod.popup
           service_data:
@@ -78,15 +133,15 @@ entities:
             card:
               type: markdown
               content: |
-                <font face="Roboto">
-
                 #### WARNING! You have overlapping cycle schedules...
 
                 {{ state_attr('binary_sensor.irrigation_cycle_start_clash', 'clash_text') }}
 
                 Please check and correct.
-
-                </font>
+              style: >
+                ha-card {
+                  border-radius: 0em 0em 1em 1em
+                }
             deviceID:
               - this
             style:
@@ -96,12 +151,13 @@ entities:
                 ]]]
               font-size: 14px
               box-shadow: 0em 0em 0.5em
+              border-radius: 1em
               opacity: 0.9
 
         styles:
           grid:
             - grid-template-areas: '"l n clash_icon warning"'
-            - grid-template-columns: min-content min-content auto 1fr  
+            - grid-template-columns: min-content min-content 10% 1fr  
             - grid-template-rows: 1fr
           card:
             - font-family: >
@@ -110,8 +166,7 @@ entities:
                 ]]]
             - background: none
             - box-shadow: none
-            - padding: 5px
-            - height: 35px
+            - padding: 0.3em 0em 0em 0.5em
           name:
             - justify-self: start
             - align-self: start
@@ -120,7 +175,8 @@ entities:
                 [[[
                   if (states['input_boolean.irrigation_master_control_switch'].state == 'off')
                     return 'rgb(255, 165, 0)';
-                  else return 'var(--secondary-text-color)';
+                  else
+                    return 'var(--secondary-text-color)';
                 ]]]
           label:
             - color: var(--primary-text-color)
@@ -173,7 +229,7 @@ entities:
               else 
                 return 'none';
             ]]]
-          service: script.irrigation_stop_irrigation
+          service: script.irrigation_cancel_irrigation
           service_data:
             cycle: >
               [[[
@@ -211,16 +267,13 @@ entities:
           card:
             - background: none
             - box-shadow: none
-            - height: 35px
-            - width: >
+            - width: 1.8em
+            - display: >
                 [[[
-                  if (states['input_boolean.irrigation_cycle1_running'].state == 'on')
-                    return '35px';
-                  else if (states['input_boolean.irrigation_cycle2_running'].state == 'on')
-                    return '35px';
-                  else if (states['input_boolean.irrigation_cycle3_running'].state == 'on')
-                    return '35px';
-                  else return '0px';
+                  if (states['input_boolean.irrigation_cycle1_running'].state == 'off' &&
+                      states['input_boolean.irrigation_cycle2_running'].state == 'off' &&
+                      states['input_boolean.irrigation_cycle3_running'].state == 'of')
+                    return 'none';
                 ]]]
           icon:
             - color: >
@@ -233,9 +286,9 @@ entities:
                     return 'red';
                   else return 'var(--primary-background-color)';
                 ]]]
-            - width: 35px
+            - width: 1.8em
 
-      #=== MASTER CONTROL SWITCH (When on)
+      #=== MASTER CONTROL SWITCH (When off)
       - type: custom:button-card
         entity: input_boolean.irrigation_master_control_switch
         icon: mdi:toggle-switch-off-outline
@@ -244,31 +297,29 @@ entities:
           card:
             - box-shadow: none
             - background: none
-            - height: 35px
             - width: >
                 [[[
                   if (states['input_boolean.irrigation_master_control_switch'].state == 'off')
-                    return '55px';
-                  else return '0px';
+                    return '1.8em';
+                  else return '0em';
                 ]]]
           icon:
             - color: var(--text-color)
-            - width: 45px
+            - width: 1.8em
 
     style: >
       ha-card {
         background: none;
         margin-top: -0.75em;
-        margin-bottom: -1em;
         box-shadow: none;
       }
 
-  - type: custom:hui-element
-    row_type: divider
+  - type: divider
 
 style: >
   ha-card {
     background: none;
     margin-top: -0.5em;
-    box_shadow: none
+    margin-bottom: -0.3em;
+    box-shadow: none;
   }

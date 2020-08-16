@@ -40,7 +40,6 @@ automation:
     #===    Master Control switch must be On
     #===    No other cycle is currently running
     #===    The cycle is enabled
-    #===    The cycle is scheduled to run on this day
     #=================================================
     condition:
       #=== Only continue if Master Control Switch is on
@@ -63,16 +62,12 @@ automation:
         value_template: >
           {% set start_time_cycle1 = states('sensor.irrigation_cycle1_start_time_in_seconds') | int %}
           {% set start_time_cycle1 = start_time_cycle1 | timestamp_custom('%H:%M', false) %}
-          {% set start_time_cycle2 = states('sensor.irrigation_cycle2_start_time_in_seconds') | int %}
-          {% set start_time_cycle2 = start_time_cycle2 | timestamp_custom('%H:%M', false) %}
-          {% set now = states('sensor.time') %}
-          {% if now == start_time_cycle1 %}
+          {% if states('sensor.time') == start_time_cycle1 %}
             {% set cycle = 'cycle1' %}
-          {% elif now == start_time_cycle2 %}
-            {% set cycle = 'cycle2' %}
           {% else %}
-            {% set cycle = 'none' %}
+            {% set cycle = 'cycle2' %}
           {% endif %}
+
           {% if 'cycle3' in trigger.entity_id %}
             True
           {% elif states('input_boolean.irrigation_' ~ cycle ~ '_schedule_enabled') =='on' %}
@@ -81,34 +76,12 @@ automation:
             False
           {% endif %}
 
-      #=== Check this cycle runs today. NOTE: cycle 3 doesn't have scheduled days
-      - condition: template
-        value_template: >
-          {% set start_time_cycle1 = states('sensor.irrigation_cycle1_start_time_in_seconds') | int %}
-          {% set start_time_cycle1 = start_time_cycle1 | timestamp_custom('%H:%M', false) %}
-          {% if states('sensor.time') == start_time_cycle1 %}
-            {% set cycle = 'cycle1' %}
-          {% else %}
-            {% set cycle = 'cycle2' %}
-          {% endif %}
-
-          {% set today = now().strftime('%a') | lower %}
-
-          {% if 'cycle3' in trigger.entity_id %}
-            True
-          {% elif states('input_boolean.irrigation_' ~ cycle ~ '_' ~ today ) == 'on' %}
-            True
-          {% else %}
-            False
-          {% endif %}
-
-    #================================================
+    #===============================================
     #=== ACTIONS
     #===    Indicate to system that cycle is runing
     #===    Update details of last run
-    #===    Update irrigation daily adjusted run time
     #===    Start the irrigation process
-    #================================================
+    #===============================================
     action:
       #== Set the cycle to be running
       - service: homeassistant.turn_on
@@ -135,15 +108,16 @@ automation:
       #===================================================
       #=== SET DETAILS OF LAST RUN FOR THE STATUS SECTION
       #===================================================
-      #=== Set previous run times for all zones to 'None'
+      #=== Set previous run times for all zones to ' '
       - service: input_text.set_value
         data_template:
           entity_id: >
-            {% for input_text in states.input_text if '_previous_duration_in_seconds' in input_text.entity_id -%}
+            {% for input_text in states.input_text if input_text.object_id.startswith('irrigation_zone') and
+                                                      input_text.object_id.endswith('_previous_duration_in_seconds')  -%}
               {{ input_text.entity_id }}
               {%- if not loop.last %}, {% endif %}
             {%- endfor %}
-          value: None
+          value: ''
 
       #=== Set previous total watering time to 'none'
       - service: input_text.set_value
@@ -186,8 +160,6 @@ automation:
       #======================
       #=== START THE PROCESS
       #======================
-      - service: script.turn_off
-        entity_id: script.irrigation_irrigate_a_zone
       - service: script.irrigation_irrigate_a_zone
         data_template:
           cycle: >
@@ -203,3 +175,4 @@ automation:
             {% endif %}
           zone: zone1
           pause: 0
+

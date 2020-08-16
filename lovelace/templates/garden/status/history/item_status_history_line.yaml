@@ -1,6 +1,9 @@
 # lovelace_gen
 
 type: custom:button-card
+triggers_update:
+  - sensor.irrigation_{{ zone }}_total_time_today
+  - sensor.irrigation_{{ zone }}_total_time_yesterday
 name: >
   [[[
     var zone = '{{ zone }}';
@@ -29,7 +32,6 @@ styles:
     - font-size: 14px
     - font-family: "[[[ return states['input_text.irrigation_ui_font_family'].state ]]]"
     - padding: 0px
-    - height: 1.5em
     - background: none
     - box-shadow: none
   name:

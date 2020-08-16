@@ -2,14 +2,13 @@
 
 <h2>MOST IMPORTANT</h2>
 
-__This is NOT quite a '*pick-it-up-and-drop-it-in*' solution. There are a few idiosyncracities which require some understanding of Home Assistant in general and of Lovelace in particular.__
-
-__Be prepared to spend some time setting it up if you choose to try it out__
+__The latest version (uploaded 05/06/2020) goes some way towards removing many of the annoyances and issues that people experienced when setting this up for the first time. I now cautiously hope that this is virtually a '*pick-it-up-and-drop-it-in*' solution.
+Please note the word 'cautiously' and I still recommend some understanding of Home Assistant in general and of Lovelace in particular if you choose to try this out__
 
 
 <h2>Prerequisites</h2>
 
-There are some [prerequisites](https://github.com/kloggy/HA-Irrigation-Version2/blob/master/prerequisites.md) to setting this up. PLEASE READ THEM. Any questions posted that look like they haven't been read may be ignored.
+There are some [prerequisites](https://github.com/kloggy/HA-Irrigation-Version2/blob/master/Pre-Requisites.md) to setting this up. PLEASE READ THEM. Any questions posted that look like they haven't been read may be ignored.
 
 
 Please note that as it stands this assumes that you are using `yaml` mode for Lovelace because that is what I use.
@@ -17,20 +16,24 @@ Please note that as it stands this assumes that you are using `yaml` mode for Lo
 
 <h2> Also Important</h2>
 
-I am posting this project *purely as a way to share it* because people showed an interest in Version 1. It is not presented as a 'turn-key' solution. It is purely *my personal solution* which I am more than happy for anyone to use in any way they see fit. Please understand that Version 2 will require some configuration and customisation on your part to make it work. I am prepared to help people get it working but only if you have shown that you have tried more than just copying the files. The prerequisites are documented and must be followed.
+I am posting this project *purely as a way to share it* because people showed an interest in Version 1. It is *my personal solution* which I am more than happy for anyone to use in any way they see fit. I am prepared to help people get this working but only if you have shown that you have tried more than just copying the files. The prerequisites are documented and must be followed.
 
-I am only using GitHub literally as a repository. What that means is I just copy my code from my PC to here so that it can be shared. There is no formal version control here other than that inherent in the Github editing history.
+I am only using GitHub literally as a repository. What that means is I simply copy my code from my PC to here so that it can be shared. There is no formal version control here other than that inherent in the Github editing history.
 
 One day maybe I'll delve further into how GitHub works but for now I'm afraid that is the situation.
 
 
-<h2>Background</h2>
+__IMPORTANT__ - This is still(!) to be considered a *__beta__* of Version 2 but unless anyone finds anything I think I am done with it! I can't think of any improvements, at least not ones that I think I want to attempt! This version has many cosmetic improvements (IMO) as well as some functional ones:
+- Each Zone within a Cycle can be scheduled to run on selected days
+- All weather sensors are user configuarable and (I think) can be completely ignored if you don't want to use the weather adjustmenst.
 
-__IMPORTANT__ - This is now a *__beta__* of Version 2. For anyone who was using the 'Preview' it has a few cosmetic improvements (IMO) and I have completely restructured the Lovelace code. I think it might now be more efficient and also every section is in its own file so that should make it easier if you wish to change anything.
+I have further restructured the Lovelace code so that everything is in the `templates/garden` folder. Any *files* you have that are in the `template` folder left over from an old version can be removed (unless of course you have a use for them elsewhere).
 
-As far as I know, and no one who used the preview told me otherwise, it works perfectly. If you decide to use it in any way be sure to read ALL of this page.
+If you decide to use this package be sure to read ALL of this page!
 
 -----
+
+<h2>Background</h2>
 
 I wrote this package mainly because Version 1 of my irrigation package worked so well for me that the 'chief gardener' in this house (my wife!) decided she would really like to expand it from four zones to eight so as to include the flower beds as well as the lawn.
 
@@ -40,26 +43,26 @@ One reason for this decision was that Version 1 had been one of the first things
 
 Also, being early 2020 many of us found ourselves with too much time on our hands due to the Corona virus so it seemed like a perfect project to pass some of the time.
 
-All that time did not necessarily work in its favour though and this project has possibly ended up growing organically rather than through good design. Furthermore as I learnt new techniques in Lovelace this became as much a project about the user interface as it did about the irrigation.
+As I was writing it I was also learning new techniques in Lovelace from the forum so this became as much a project about the user interface as it did about the irrigation.
 
-I am by no means a Javascript or CSS programmer so there may well be things I (or you) can improve on at some point in the future. 
+But... I am by no means a Javascript or CSS programmer so there may well be things I (or you) can improve on at some point in the future. 
 
-Version 1 was designed around a Sonoff 4ch but for Version 2, I will use an 8 relay board controlled with an ESP32.
+Version 1 was designed around a Sonoff 4ch but for Version 2 I will use an 8 relay board controlled with an ESP32.
 This in itself should make little difference as ultimately all the package does is turn switches on and off.
 
-This package has been designed with two scheduled cycles per day with each cycle having up to eight zones. The number of zones can be configured from the UI and like Version 1, if more zones are needed some of the 'globals' need to be replicated (but I have not tried this).
-
-Both scheduled cycles can be set to run at any time on any day(s) of the week.
+This package has been designed with two scheduled cycles per day with each cycle having up to eight zones and all zones can be scheduled to run on any day(s) of the week.
 
 A manual cycle is also provided.
 
-The watering times can be automatically adjusted based on rainfall and temperature and whilst I think this has been improved in Version 2, as in Version 1 this is quite experimental. It is different to (better than) Version 1 in that both the rainfall and temperature adjustments can be turned on or off independently of each other and separately for each cycle.
+The watering times can be automatically adjusted based on rainfall and temperature and whilst I think this has been improved in Version 2, as in Version 1 this is quite experimental. It is different to (better than) Version 1 in that both the rainfall and temperature adjustments can be turned on or off independently of each other and separately for each cycle and the sensors can easily be configured to use any weather source you choose.
 
-Almost everything can be set from the UI including the friendly names of cycles and zones. Tap/click on most fields to change them in a pop-up (but remember that if you have several browser tabs open the pop-ups may appear on a different tab!). 
+Almost everything can be set from the UI including the friendly names of cycles and zones. Tap/click on fields to change them in a pop-up (but remember that if you have several browser tabs open the pop-ups may appear on a different tab!). 
 
-__Note -__ Extensive use is made of `!include` to avoid code repetition. You need to replicate the folder structure in order for it to work. You can change the lovelace code if it suits you and so have your own folder structure but I can't help if you choose to do that.
+__Note -__ Extensive use is made of `!include` to avoid code repetition. You need to replicate the folder structure in order for it to work. You can change the lovelace code if it suits you to have your own folder structure but I can't help if you choose to do that.
 
-As it stands you need a `lovelace` folder and the folder that your packages are in.
+As it stands you need a `lovelace` folder and of course the usual folder that your packages are in.
+
+(See the following documentation for [packages](https://www.home-assistant.io/docs/configuration/packages/) and [Lovelace](https://www.home-assistant.io/lovelace/dashboards-and-views/)).
 
 --------------
 
