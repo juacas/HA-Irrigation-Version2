@@ -35,12 +35,13 @@ automation:
         entity_id: input_boolean.irrigation_cycle3_running
         to: 'on'
 
-    #=================================================
+    #===================================================
     #=== CONDITIONS
     #===    Master Control switch must be On
     #===    No other cycle is currently running
     #===    The cycle is enabled
-    #=================================================
+    #===    It is not raining now if option is selected
+    #===================================================
     condition:
       #=== Only continue if Master Control Switch is on
       - condition: state
@@ -76,13 +77,34 @@ automation:
             False
           {% endif %}
 
+      #=== Check it is not raining if that option is enabled. NOTE: don't check this for cycle 3
+      - condition: template
+        value_template: >
+          {% if 'cycle3' in trigger.entity_id %}
+            True
+          {% elif states('input_boolean.irrigation_ignore_schedule_if_raining') == 'off' %}
+            True
+          {% elif states('input_boolean.irrigation_ignore_schedule_if_raining') == 'on' and
+                  states(states('input_text.irrigation_external_sensor_raining_now')) == 'off' %}
+            True
+          {% else %}
+            False
+          {% endif %}
+
+
     #===============================================
     #=== ACTIONS
     #===    Indicate to system that cycle is runing
-    #===    Update details of last run
-    #===    Start the irrigation process
     #===============================================
     action:
+      #==================================================
+      # Update Smart Irrigation for the day
+      #==================================================
+      - service: smart_irrigation.smart_irrigation_calculate_daily_adjusted_run_time
+      #==================================================
+      # Wait 5 seconds to calculate irrigation
+      #==================================================
+      - delay: '00:00:05'
       #== Set the cycle to be running
       - service: homeassistant.turn_on
         data_template:
@@ -97,82 +119,3 @@ automation:
             {% else %}
               {{ 'input_boolean.irrigation_cycle2_running' }}
             {% endif %}
-      #==================================================
-      # Update Smart Irrigation for the day
-      #==================================================
-      - service: smart_irrigation.smart_irrigation_calculate_daily_adjusted_run_time
-      #==================================================
-      # Wait 5 seconds to calculate irrigation
-      #==================================================
-      - delay: '00:00:05'
-      #===================================================
-      #=== SET DETAILS OF LAST RUN FOR THE STATUS SECTION
-      #===================================================
-      #=== Set previous run times for all zones to ' '
-      - service: input_text.set_value
-        data_template:
-          entity_id: >
-            {% for input_text in states.input_text if input_text.object_id.startswith('irrigation_zone') and
-                                                      input_text.object_id.endswith('_previous_duration_in_seconds')  -%}
-              {{ input_text.entity_id }}
-              {%- if not loop.last %}, {% endif %}
-            {%- endfor %}
-          value: ''
-
-      #=== Set previous total watering time to 'none'
-      - service: input_text.set_value
-        data:
-          entity_id: input_text.irrigation_previous_total_watering_time
-          value: None
-
-      #=== Set previous cycle total time to zero
-      - service: input_text.set_value
-        data:
-          entity_id: input_text.irrigation_previous_total_watering_time
-          value: 0
-
-      #=== Update Last Run cycle name
-      - service: input_text.set_value
-        data_template:
-          entity_id: input_text.irrigation_previous_run_cycle_name
-          value: >
-            {% set start_time_cycle1 = states('sensor.irrigation_cycle1_start_time_in_seconds') | int %}
-            {% set start_time_cycle1 = start_time_cycle1 | timestamp_custom('%H:%M', false) %}
-
-            {% if 'cycle3' in trigger.entity_id %}
-              {% set cycle = 'cycle3' %}
-            {% elif states('sensor.time') == start_time_cycle1 %}
-              {% set cycle = 'cycle1' %}
-            {% else %}
-              {% set cycle = 'cycle2' %}
-            {% endif %}
-
-            {{ states('input_text.irrigation_' ~ cycle ~ '_name') }}
-
-      #=== Update Last Run date and time
-      - service: input_text.set_value
-        data_template:
-          entity_id: input_text.irrigation_previous_run_date_and_time
-          value: >
-            {{ now().strftime("%A %d %B at %H:%M") }}
-
-
-      #======================
-      #=== START THE PROCESS
-      #======================
-      - service: script.irrigation_irrigate_a_zone
-        data_template:
-          cycle: >
-            {% set start_time_cycle1 = states('sensor.irrigation_cycle1_start_time_in_seconds') | int %}
-            {% set start_time_cycle1 = start_time_cycle1 | timestamp_custom('%H:%M', false) %}
-
-            {% if 'cycle3' in trigger.entity_id %}
-              cycle3
-            {% elif states('sensor.time') == start_time_cycle1 %}
-              cycle1
-            {% else %}
-              cycle2
-            {% endif %}
-          zone: zone1
-          pause: 0
-

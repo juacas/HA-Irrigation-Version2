@@ -3,11 +3,12 @@ __Weather Sensors__
 All weather sensors can be defined by the user.
 
 There are five sensors used in this system
-- Current Temperature
-- Forecast High Temperature Today
-- Total Rainfall so far today: This is notoriously hard to get good data for unless you have a weather station of your own.
+
+1. Current Temperature
+2. Forecast High Temperature Today
+3. Total Rainfall so far today: This is notoriously hard to get good data for unless you have a weather station of your own.
 I use Smartweather to reasonably good effect but I know it is not available in all regions.
-- Actual Rainfall yesterday
+4. Actual Rainfall yesterday
 
 The fifth sensor needs to return any text string describing the weather outlook (or anything else you want!).
 
@@ -35,5 +36,6 @@ You'll also need to register for an `api_key`.
 
 Of course there is *no requirement* to use Smartweather for rainfall data but if you use something else you will need to change the Lovelace to fit and also the code that collects rainfall measurements.
 
-There are some pointers for setting SmartWeather up [here](https://github.com/kloggy/HA-Irrigation-Version2/blob/master/smartweather_example.md).
+There are some pointers for setting SmartWeather up [here](https://github.com/kloggy/HA-Irrigation-Version2/blob/master/Smartweather%20Example.md).
 
+Of course there is *no requirement* to use Smartweather for rainfall data but if you use something else you will need to change the Lovelace to fit and also the code that collects rainfall measurements.

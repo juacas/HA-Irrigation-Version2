@@ -51,14 +51,14 @@ automation:
       #=== Turn off all zone valves explicitly 
       - service: switch.turn_off
         data_template:
-          entity_id: >
-            {% for switch_name in states.input_text
-                if switch_name.object_id.startswith('irrigation_zone')
-                  and switch_name.object_id.endswith('switch_entity_id') -%}
-                      {% if states(switch_name.state) == 'unknown' -%}
-                          {#{ 'switch.irrigation_dummy_switch' ~ loop.index }#}          
-                        {%- else %}
-                          {%- if loop.index > 1 %}, {% endif -%}
-                          {{ switch_name.state }}
-                        {%- endif %}
-                      {%- endfor %}
+          entity_id: > 
+            {% for switch_name in states.input_text if switch_name.object_id.startswith('irrigation_zone') and
+                                                      switch_name.object_id.endswith('switch_entity_id') -%}
+            {% if states(switch_name.entity_id) == 'unknown' or
+                  states(switch_name.entity_id) == 'none' -%}
+                {{ 'switch.irrigation_dummy_switch' ~ loop.index }}
+              {%- else %}
+                {{ states(switch_name.entity_id) }}
+              {%- endif %}
+              {%- if not loop.last %}, {% endif %}
+            {%- endfor %}

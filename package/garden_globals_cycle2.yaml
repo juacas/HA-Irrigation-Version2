@@ -1,8 +1,39 @@
 
 #==================
+#=== Input Selects
+#==================
+input_select:
+  irrigation_cycle2_start_time_type:
+    options: 
+      - Actual Time
+      - Sunrise Offset
+      - Sunset Offset
+
+
+#==================
 #=== Input Numbers
 #==================
 input_number:
+
+  #=====================================
+  #=== Start time Sunrise/Sunset offset
+  #=====================================
+  irrigation_cycle2_start_time_sunrise_offset: 
+    name: Sunrise Offset
+    min: -120
+    max: 120
+    mode: box
+    unit_of_measurement: min
+    icon: mdi:weather-sunset-up
+
+  irrigation_cycle2_start_time_sunset_offset: 
+    name: Sunset Offset
+    min: -120
+    max: 120
+    mode: box
+    unit_of_measurement: min
+    icon: mdi:weather-sunset-down
+
 
   #=====================================
   #=== Cycle 2 zone durations (Sliders)
@@ -196,77 +227,6 @@ input_boolean:
     icon: mdi:weather-fog
     initial: on
 
-  #=================================
-  #=== Days on which to run Cycle 2
-  #=================================
-  irrigation_cycle2_every_day:
-    name: Cycle 2, Every day
-    icon: mdi:numeric-7-box-multiple-outline
-
-  irrigation_cycle2_mon:
-    name: Cycle 2, Monday
-    icon: mdi:numeric-1-box-outline
-
-  irrigation_cycle2_tue:
-    name: Cycle 2, Tuesday
-    icon: mdi:numeric-2-box-outline
-
-  irrigation_cycle2_wed:
-    name: Cycle 2, Wednesday
-    icon: mdi:numeric-3-box-outline
-
-  irrigation_cycle2_thu:
-    name: Cycle 2, Thursday
-    icon: mdi:numeric-4-box-outline
-
-  irrigation_cycle2_fri:
-    name: Cycle 2, Friday
-    icon: mdi:numeric-5-box-outline
-
-  irrigation_cycle2_sat:
-    name: Cycle 2, Saturday
-    icon: mdi:numeric-6-box-outline
-
-  irrigation_cycle2_sun:
-    name: Cycle 2, Sunday
-    icon: mdi:numeric-7-box-outline
-
-
-  #===========================
-  #=== Skip Zone For Next Run
-  #===========================
-  irrigation_cycle2_zone1_skip:
-    name: Cycle 2, Zone 1 Skip
-    icon: mdi:close-circle-outline
-
-  irrigation_cycle2_zone2_skip:
-    name: Cycle 2, Zone 2 Skip
-    icon: mdi:close-circle-outline
-
-  irrigation_cycle2_zone3_skip:
-    name: Cycle 2, Zone 3 Skip
-    icon: mdi:close-circle-outline
-
-  irrigation_cycle2_zone4_skip:
-    name: Cycle 2, Zone 4 Skip
-    icon: mdi:close-circle-outline
-
-  irrigation_cycle2_zone5_skip:
-    name: Cycle 2, Zone 5 Skip
-    icon: mdi:close-circle-outline
-
-  irrigation_cycle2_zone6_skip:
-    name: Cycle 2, Zone 6 Skip
-    icon: mdi:close-circle-outline
-
-  irrigation_cycle2_zone7_skip:
-    name: Cycle 2, Zone 7 Skip
-    icon: mdi:close-circle-outline
-
-  irrigation_cycle2_zone8_skip:
-    name: Cycle 2, Zone 8 Skip
-    icon: mdi:close-circle-outline
-
 
 #============
 #=== Sensors
@@ -284,17 +244,25 @@ sensor:
       irrigation_cycle2_duration_in_seconds:
         unit_of_measurement: 's'
         friendly_name: Cycle 2 Duration In Seconds
+        entity_id:
+          - input_number.irrigation_number_of_zones
+          - sensor.irrigation_cycle2_zone1_actual_duration_in_seconds
+          - sensor.irrigation_cycle2_zone2_actual_duration_in_seconds
+          - sensor.irrigation_cycle2_zone3_actual_duration_in_seconds
+          - sensor.irrigation_cycle2_zone4_actual_duration_in_seconds
+          - sensor.irrigation_cycle2_zone5_actual_duration_in_seconds
+          - sensor.irrigation_cycle2_zone6_actual_duration_in_seconds
+          - sensor.irrigation_cycle2_zone7_actual_duration_in_seconds
+          - sensor.irrigation_cycle2_zone8_actual_duration_in_seconds
         value_template: >
-          {{
-            states('sensor.irrigation_cycle2_zone1_actual_duration_in_seconds') | int +
-            states('sensor.irrigation_cycle2_zone2_actual_duration_in_seconds') | int +
-            states('sensor.irrigation_cycle2_zone3_actual_duration_in_seconds') | int +
-            states('sensor.irrigation_cycle2_zone4_actual_duration_in_seconds') | int +
-            states('sensor.irrigation_cycle2_zone5_actual_duration_in_seconds') | int +
-            states('sensor.irrigation_cycle2_zone6_actual_duration_in_seconds') | int +
-            states('sensor.irrigation_cycle2_zone7_actual_duration_in_seconds') | int +
-            states('sensor.irrigation_cycle2_zone8_actual_duration_in_seconds') | int
-          }}
+          {% set ns = namespace(duration = 0) %}
+          {% for zone in states.sensor if zone.object_id.startswith('irrigation_cycle2_zone') and 
+                                          zone.object_id.endswith('_actual_duration_in_seconds') %}
+            {% if loop.index <= states('input_number.irrigation_number_of_zones') | int %}
+              {% set ns.duration = ns.duration + (zone.state | int) %}
+            {% endif %}
+          {% endfor %}
+          {{ ns.duration }}
 
       #=== Actual Zone durations in seconds
       irrigation_cycle2_zone1_actual_duration_in_seconds:
@@ -302,6 +270,8 @@ sensor:
         friendly_name: Cycle 2 Zone 1 Actual Duration In Seconds
         entity_id:
           - sensor.date
+          - input_number.irrigation_rainfall_multiplier
+          - input_number.irrigation_temp_multiplier
           - input_boolean.irrigation_testing_mode
           - input_boolean.irrigation_ui_show_cycle2
           - input_boolean.irrigation_cycle2_schedule_enabled
@@ -357,6 +327,8 @@ sensor:
         friendly_name: Cycle 2 Zone 2 Actual Duration In Seconds
         entity_id:
           - sensor.date
+          - input_number.irrigation_rainfall_multiplier
+          - input_number.irrigation_temp_multiplier
           - input_boolean.irrigation_testing_mode
           - input_boolean.irrigation_ui_show_cycle2
           - input_boolean.irrigation_cycle2_schedule_enabled
@@ -412,6 +384,8 @@ sensor:
         friendly_name: Cycle 2 Zone 3 Actual Duration In Seconds
         entity_id:
           - sensor.date
+          - input_number.irrigation_rainfall_multiplier
+          - input_number.irrigation_temp_multiplier
           - input_boolean.irrigation_testing_mode
           - input_boolean.irrigation_ui_show_cycle2
           - input_boolean.irrigation_cycle2_schedule_enabled
@@ -467,6 +441,8 @@ sensor:
         friendly_name: Cycle 2 Zone 4 Actual Duration In Seconds
         entity_id:
           - sensor.date
+          - input_number.irrigation_rainfall_multiplier
+          - input_number.irrigation_temp_multiplier
           - input_boolean.irrigation_testing_mode
           - input_boolean.irrigation_ui_show_cycle2
           - input_boolean.irrigation_cycle2_schedule_enabled
@@ -522,6 +498,8 @@ sensor:
         friendly_name: Cycle 2 Zone 5 Actual Duration In Seconds
         entity_id:
           - sensor.date
+          - input_number.irrigation_rainfall_multiplier
+          - input_number.irrigation_temp_multiplier
           - input_boolean.irrigation_testing_mode
           - input_boolean.irrigation_ui_show_cycle2
           - input_boolean.irrigation_cycle2_schedule_enabled
@@ -577,6 +555,8 @@ sensor:
         friendly_name: Cycle 2 Zone 6 Actual Duration In Seconds
         entity_id:
           - sensor.date
+          - input_number.irrigation_rainfall_multiplier
+          - input_number.irrigation_temp_multiplier
           - input_boolean.irrigation_testing_mode
           - input_boolean.irrigation_ui_show_cycle2
           - input_boolean.irrigation_cycle2_schedule_enabled
@@ -632,6 +612,8 @@ sensor:
         friendly_name: Cycle 2 Zone 7 Actual Duration In Seconds
         entity_id:
           - sensor.date
+          - input_number.irrigation_rainfall_multiplier
+          - input_number.irrigation_temp_multiplier
           - input_boolean.irrigation_testing_mode
           - input_boolean.irrigation_ui_show_cycle2
           - input_boolean.irrigation_cycle2_schedule_enabled
@@ -687,6 +669,8 @@ sensor:
         friendly_name: Cycle 2 Zone 8 Actual Duration In Seconds
         entity_id:
           - sensor.date
+          - input_number.irrigation_rainfall_multiplier
+          - input_number.irrigation_temp_multiplier
           - input_boolean.irrigation_testing_mode
           - input_boolean.irrigation_ui_show_cycle2
           - input_boolean.irrigation_cycle2_schedule_enabled

@@ -14,21 +14,21 @@ entities:
     card_type: horizontal-stack
     cards:
       #=== SETTINGS TITLE BUTTON
-      # Hidden for saving space
-      # - type: custom:button-card
-      #   name: -- SETTINGS --
-      #   styles:
-      #     card:
-      #       - font-size: 16px
-      #       - font-family: >
-      #           [[[
-      #             return states['input_text.irrigation_ui_font_family'].state
-      #           ]]]
-      #       - background: none
-      #       - margin: 0.1em 0em 0em 0em
-      #       - box-shadow: none
-      #  tap_action:
-      #    action: none
+      - type: custom:button-card
+        name: -- SETTINGS --
+        styles:
+          card:
+            - font-size: 16px
+            - font-family: >
+                [[[
+                  return states['input_text.irrigation_ui_font_family'].state
+                ]]]
+            - background: none
+            - margin: 0.1em 0em 0em 0em
+            - box-shadow: none
+
+        tap_action:
+          action: none
 
       #=== GENERAL
       - !include

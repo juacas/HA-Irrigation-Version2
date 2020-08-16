@@ -1,5 +1,9 @@
 <h2>Prerequisites</h2>
 
+__This package will not work on any version of Home assistant less than 0.113.2__
+
+----
+
 Some things need to be setup in your config outside of this package.
 
 I have detailed them here and provided example yaml code in `prerequisites.yaml`.
@@ -7,6 +11,15 @@ I have detailed them here and provided example yaml code in `prerequisites.yaml`
 (please let me know if you come across anything I have forgotten so that I can update this readme).
 
 ----
+
+__Folder Structure:__ There are two elements to this project, the functional code (automations, scripts etc.) and the Lovelace UI.
+
+The folder named 'lovelace' should be copied in its entirety into your config folder. If you already have a 'lovelace' folder in your config folder then just copy the contents there. This is not optional unless you edit the code as there are a lot of references to absolute file locations.
+
+The folder named 'package' is the functional code. The files within this folder can be copied anywhere you like (individually or within a folder with any name) so long as it is in HA recognises that location as its location for packages.
+
+
+__Scenes__ are used in this package. If you use `default_config:` there is no need to add anything as it is included automatically (see - https://www.home-assistant.io/integrations/default_config/) if not then somewhere (usually in your `configuration.yaml`) you must include the line `scene:`
 
 __sensor.time__ is needed somewhere in your config
 
@@ -48,8 +61,6 @@ __The Lovelace interface__ makes use of many custom integrations/cards (all inst
 - config-template-card (https://github.com/iantrich/config-template-card)
 - mini-graph-card (https://github.com/kalkih/mini-graph-card)
 - layout-card (https://github.com/thomasloven/lovelace-layout-card)
-(This might be optional, I don't need to use it anymore but if your columns don't display in the right order
-then look in `view_garden_version2.yaml`, there are some lines that need to be uncommented.)
 - state-switch (https://github.com/thomasloven/lovelace-state-switch)
 - time-picker-card (https://github.com/GeorgeSG/lovelace-time-picker-card)
 
