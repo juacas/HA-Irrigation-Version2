@@ -17,7 +17,7 @@ script:
   #================================================
   irrigation_run_a_cycle:
     description: Run An Irrigation Cycle
-    fields: 
+    fields:
       cycle:
         description: Cycle to run
         example: cycle1
@@ -49,10 +49,10 @@ script:
                     value_template: >
                       {{ states(states('input_text.irrigation_external_sensor_controller_wifi')) == 'unavailable' }}
                   sequence:
-                    - delay: 
+                    - delay:
                         seconds: >
                           {{ states('input_number.irrigation_controller_offline_wait') | int }}
-                  
+
             #=== Check if controller is now available
             - choose:
                 - conditions:
@@ -120,7 +120,16 @@ script:
                       data:
                         entity_id: input_text.irrigation_current_status
                         value: Changing Zone...
-
+                    #=== Trigger end of cycle event
+                    - event: WateringCycleFinished
+                      event_data_template:
+                        name: 'Watering Cycle Finished'
+                        cycle: "{{ cycle }}"
+                        zone: "{{ repeat.index }}"
+                        duration: >
+                          {% set duration = states('sensor.irrigation_' ~ cycle ~ '_zone' ~ repeat.index ~ '_actual_duration_in_seconds') | int %}
+                          {% set current_total = states('input_text.irrigation_previous_total_watering_time') | float %}
+                          {{ (current_total + duration) | int }}
               default:
                 #=== Update last run time for this zone
                 - service: input_text.set_value
@@ -145,7 +154,6 @@ script:
           entity_id: input_text.irrigation_current_status
           value: SYSTEM IDLE
 
-
   #=======================================
   #=== Start A Timer
   #===
@@ -156,7 +164,7 @@ script:
   #=======================================
   irrigation_start_timer:
     description: Irrigation Start A Timer
-    fields: 
+    fields:
       cycle:
         description: Cycle to run
         example: cycle1
@@ -181,7 +189,7 @@ script:
 
       #=== Set FAILSAFE time to 10 seconds longer than the zone runtime
       - service: input_number.set_value
-        data_template:        
+        data_template:
           entity_id: input_number.irrigation_failsafe_time_in_seconds
           value: >
             {{ duration | int + 10 }}
@@ -214,10 +222,10 @@ script:
               value_template: >
                 {{ states(states('input_text.irrigation_external_sensor_controller_wifi')) == 'unavailable' }}
             sequence:
-              - delay: 
+              - delay:
                   seconds: >
                     {{ states('input_number.irrigation_controller_offline_wait') | int }}
-        
+
       #=== Continue if controller is now available
       - condition: template
         value_template: >
@@ -228,4 +236,3 @@ script:
         data_template:
           entity_id: >
             {{ states('input_text.irrigation_' ~ zone ~ '_switch_entity_id') }}
-

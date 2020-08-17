@@ -157,6 +157,8 @@ card:
                           name: Duration
                         - entity: input_text.irrigation_zone{{ zone }}_name
                           name: Zone Name
+                        - entity: input_number.irrigation_zone{{ zone }}_percent_adjust
+                          name: Percentage of runtime
                         - entity: input_text.irrigation_zone{{ zone }}_switch_entity_id
                           name: Switch Name
                       # style: >
@@ -191,7 +193,7 @@ card:
                           --secondary-background-color: var(--paper-dialog-background-color);
                       opacity: 0.9;
                         }
-                
+
             style: |
               ha-card {
                 box-shadow: none;
@@ -274,4 +276,3 @@ card:
               - item_cycle_day_select_button.yaml
               - entity: input_boolean.irrigation_cycle{{ cycle }}_zone{{ zone }}_sun
                 name: Sun
-
