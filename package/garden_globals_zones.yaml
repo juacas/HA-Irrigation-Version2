@@ -267,7 +267,7 @@ sensor:
   #=================================
   #=== Zone History Sensors - TODAY
   #=================================
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone1_total_time_today
     entity_id: sensor.irrigation_sensor_zone1_switch
     state: 'on'
@@ -275,7 +275,7 @@ sensor:
     start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
     end: '{{ now() }}'
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone2_total_time_today
     entity_id: sensor.irrigation_sensor_zone2_switch
     state: 'on'
@@ -283,7 +283,7 @@ sensor:
     start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
     end: '{{ now() }}'
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone3_total_time_today
     entity_id: sensor.irrigation_sensor_zone3_switch
     state: 'on'
@@ -291,7 +291,7 @@ sensor:
     start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
     end: '{{ now() }}'
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone4_total_time_today
     entity_id: sensor.irrigation_sensor_zone4_switch
     state: 'on'
@@ -299,7 +299,7 @@ sensor:
     start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
     end: '{{ now() }}'
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone5_total_time_today
     entity_id: sensor.irrigation_sensor_zone5_switch
     state: 'on'
@@ -307,7 +307,7 @@ sensor:
     start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
     end: '{{ now() }}'
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone6_total_time_today
     entity_id: sensor.irrigation_sensor_zone6_switch
     state: 'on'
@@ -315,7 +315,7 @@ sensor:
     start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
     end: '{{ now() }}'
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone7_total_time_today
     entity_id: sensor.irrigation_sensor_zone7_switch
     state: 'on'
@@ -323,7 +323,7 @@ sensor:
     start: '{{ now().replace(hour=0).replace(minute=0).replace(second=0) }}'
     end: '{{ now() }}'
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone8_total_time_today
     entity_id: sensor.irrigation_sensor_zone8_switch
     state: 'on'
@@ -334,7 +334,7 @@ sensor:
   #=====================================
   #=== Zone History Sensors - YESTERDAY
   #=====================================
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone1_total_time_yesterday
     entity_id: sensor.irrigation_sensor_zone1_switch
     state: 'on'
@@ -343,7 +343,7 @@ sensor:
     duration:
       hours: 24
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone2_total_time_yesterday
     entity_id: sensor.irrigation_sensor_zone2_switch
     state: 'on'
@@ -352,7 +352,7 @@ sensor:
     duration:
       hours: 24
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone3_total_time_yesterday
     entity_id: sensor.irrigation_sensor_zone3_switch
     state: 'on'
@@ -361,7 +361,7 @@ sensor:
     duration:
       hours: 24
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone4_total_time_yesterday
     entity_id: sensor.irrigation_sensor_zone4_switch
     state: 'on'
@@ -370,7 +370,7 @@ sensor:
     duration:
       hours: 24
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone5_total_time_yesterday
     entity_id: sensor.irrigation_sensor_zone5_switch
     state: 'on'
@@ -379,7 +379,7 @@ sensor:
     duration:
       hours: 24
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone6_total_time_yesterday
     entity_id: sensor.irrigation_sensor_zone6_switch
     state: 'on'
@@ -388,7 +388,7 @@ sensor:
     duration:
       hours: 24
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone7_total_time_yesterday
     entity_id: sensor.irrigation_sensor_zone7_switch
     state: 'on'
@@ -397,7 +397,7 @@ sensor:
     duration:
       hours: 24
 
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone8_total_time_yesterday
     entity_id: sensor.irrigation_sensor_zone8_switch
     state: 'on'

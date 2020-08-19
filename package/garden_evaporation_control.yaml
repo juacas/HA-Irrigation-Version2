@@ -52,7 +52,8 @@ script:
       - service: input_datetime.set_datetime
         data_template:
           entity_id: input_datetime.irrigation_zone{{ zone }}_watering_finished
-          datetime: "{{ now().strftime('%Y-%m-%d %H:%M:%S') }}"
+          datetime: "{{ now() }}.strftime('%Y-%m-%d %H:%M:%S')"
+          # .strftime('%Y-%m-%d %H:%M:%S')
       #=== Reset water bucket
       - service: smart_irrigation.smart_irrigation_reset_bucket
 
@@ -140,30 +141,38 @@ sensor:
   - platform: template
     sensors:
       additional_watering_total_zone1:
-        friendly_name: Sum of rain and irrigation
+        friendly_name: Sum of rain and additonal irrigation from last cycle
         value_template: >
           {% set precip = states('sensor.aemet_precipitation_daily')|float %}
-          {% set irrig = states('input_datetime.irrigation_zone1_additional_time_today')|float %}
+          {% set irrig = states('sensor.irrigation_zone1_additional_time_today')|float %}
           {% set throughput = state_attr('sensor.smart_irrigation_base_schedule_index','throughput')[:5]|float %}
           {% set surface = state_attr('sensor.smart_irrigation_base_schedule_index','area')[:-3]|float %}
-          {% set irrigmm = precip + irrig*60*throughput/surface  %}
+          {% set irrigmm = precip + irrig/60*throughput/surface  %}
           {{ irrigmm | float}}
         entity_id:
-          - sensor.irrigation_zone1_total_time_today
+          - sensor.irrigation_zone1_additional_time_today
           - sensor.aemet_precipitation_daily
           - sensor.aemet_precipitation
         unit_of_measurement: 'mm'
 #==========================================
 #=== Zone History Sensors - from last cycle
 #==========================================
-  - platform: history_stats
+  - platform: history_stats_in_seconds
     name: irrigation_zone1_additional_time_today
     entity_id: switch.sonoff_1000cac6d4_1
     state: 'on'
     type: time
     start: >
-      {{ states('input_datetime.irrigation_zone1_watering_finished') }}
+      {{ states('input_datetime.irrigation_zone1_watering_finished') }}+2
     end: '{{ now() }}'
+  # - platform: history_stats
+  #   name: irrigation_zone1_additional_time_today_hours
+  #   entity_id: switch.sonoff_1000cac6d4_1
+  #   state: 'on'
+  #   type: time
+  #   start: >
+  #     {{ states('input_datetime.irrigation_zone1_watering_finished') }}+2
+  #   end: '{{ now() }}'
 
   # - platform: template
   #   sensors:
