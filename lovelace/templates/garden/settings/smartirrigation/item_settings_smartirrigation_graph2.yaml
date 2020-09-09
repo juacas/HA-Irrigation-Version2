@@ -11,14 +11,15 @@ entities:
   - entity: sensor.aemet_precipitation
     name: Precipitation
     y_axis: secondary
-  - entity: sensor.smart_irrigation_hourly_netto_precipitation
-    name: NETTO
-    y_axis: secondary
-    color: black
   - entity: sensor.smart_evapotranspiration
     name: Evaporation
     y_axis: secondary
     color: black
+  - entity: sensor.additional_watering_total_zone1
+    name: Extra watering/rain
+    color: SteelBlue
+    y_axis: secondary
+    show_legend: true
 line_width: 2
 hours_to_show: 24
 points_per_hour: 8
@@ -37,4 +38,3 @@ style: >
     background: none;
     border-radius: 0px;
   }
-

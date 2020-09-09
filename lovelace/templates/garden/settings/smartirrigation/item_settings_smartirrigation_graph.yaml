@@ -8,8 +8,11 @@ entities:
     color: IndianRed
     show_legend: true
   - entity: sensor.smart_irrigation_hourly_adjusted_run_time
-    color: SteelBlue
+    color: IndianRed
     show_legend: true
+  - entity: sensor.smart_irrigation_hourly_netto_precipitation
+    name: NETTO
+    color: black
 line_width: 2
 hours_to_show: 24
 points_per_hour: 8
@@ -28,4 +31,3 @@ style: >
     background: none;
     border-radius: 0px;
   }
-

@@ -79,8 +79,8 @@ entities:
       #=== Precipitation 24 hours
       - !include
           - ../item_settings_line.yaml
-          - entity: sensor.aemet_precipitation_daily
-            name: 24 hours precipitation
+          - entity: sensor.additional_watering_total_zone1
+            name: Extra water
             round: 1
             tap_action: none
 

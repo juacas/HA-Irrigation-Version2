@@ -1,197 +1,198 @@
-  #==================================================
-  #=== Evaporation Run Time updated
-  #=== Keep input_number slider and box synchronised
-  #==================================================
-automation:
-  - alias: Evaporation Run Time Synchronisation
-    trigger:
-      - platform: state
-        entity_id:
-          - sensor.smart_irrigation_daily_adjusted_run_time
-          - sensor.smart_irrigation_hourly_adjusted_run_time
-    action:
-      # - service: notify.notify
-      #   data_template:
-      #     message: >
-      #       SmartIrrigation just changed from {{ trigger.from_state.state }}
-      #       to {{ trigger.to_state.state }}
-      - service: script.turn_on
+irrigation2_evaporation_control:
+    #==================================================
+    #=== Evaporation Run Time updated
+    #=== Keep input_number slider and box synchronised
+    #==================================================
+  automation:
+    - alias: Evaporation Run Time Synchronisation
+      trigger:
+        - platform: state
+          entity_id:
+            - sensor.smart_irrigation_daily_adjusted_run_time
+            - sensor.smart_irrigation_hourly_adjusted_run_time
+      mode: restart
+      action:
+        # - service: notify.notify
+        #   data_template:
+        #     message: >
+        #       SmartIrrigation just changed from {{ trigger.from_state.state }}
+        #       to {{ trigger.to_state.state }}
+        - service: script.turn_on
+          data_template:
+            entity_id: script.update_runtimes_from_evaporation
+            variables:
+              adjusted_run_time: '{{ trigger.to_state.state | float }}'
+  #=== END OF ZONE DURATION CHANGES
+
+  #===============================
+  #=== EVENTS
+  #===============================
+
+  #==== Process the end of cycle 1
+    - alias: onWateringCycleFinished
+      trigger:
+        - platform: event
+          event_type: WateringCycleFinished
+      condition:
+        condition: template
+        value_template: "{{ trigger.event.data.cycle == 'cycle1' }}"
+      action:
+        service: script.turn_on
         data_template:
-          entity_id: script.update_runtimes_from_evaporation
+          entity_id: script.cycle_finished
           variables:
-            adjusted_run_time: '{{ trigger.to_state.state | float }}'
-#=== END OF ZONE DURATION CHANGES
+            cycle: "{{ trigger.event.data.cycle }}"
+  #==== end of cycle finished event
+  #==== scripts
+  script:
+    cycle_finished:
+      description: "Record and process when cycle 1 finishes"
+      fields:
+        cycle:
+          description: 'Number of the cycle that finished'
+          example: cycle1
+      mode: queued
+      sequence:
+        - service: input_datetime.set_datetime
+          data_template:
+            entity_id: input_datetime.irrigation_zone1_watering_finished
+            datetime: "{{ now() }}"
+            # .strftime('%Y-%m-%d %H:%M:%S')
+        # Reset bucket only if has been watered. Else continue accumulating precipitation.
+        - condition: numeric_state
+          entity_id: sensor.smart_irrigation_daily_adjusted_run_time
+          above: 0
+        #=== Reset water bucket.
+        - service: smart_irrigation.smart_irrigation_reset_bucket
 
-#==== Process the end of cycle 1
-  - alias: onWateringCycleFinished
-    trigger:
-      - platform: event
-        event_type: WateringCycleFinished
-    action:
-      service: script.turn_on
-      data_template:
-        entity_id: script.cycle_finished
-        variables:
-          cycle: "{{ trigger.event.data.cycle }}"
-          zone: "{{ trigger.event.data.zone }}"
-#==== end of cycle finished event
+    update_runtimes_from_evaporation:
+      description: "Calculates the runtimes as a percentage of overall estimation."
+      fields:
+        adjusted_run_time:
+          description: Estimated run time in seconds.
+          example: 300
+      mode: queued
+      sequence:
+        # - service: logbook.log
+        #   data_template:
+        #     name: Watertime
+        #     message: "Value updated to {{ adjusted_run_time|float }} seconds from SmartIrrigation"
+        - service: input_number.set_value
+          data_template:
+            entity_id: >
+              {% if states('input_boolean.irrigation_cycle1_adjust_for_smartirrigation') == 'on' %}
+              input_number.irrigation_cycle1_zone1_duration
+              {% else %}
+              None
+              {% endif %}
+            value: >
+              {{ (adjusted_run_time|float * states('input_number.irrigation_zone1_percent_adjust')|float /60 /100) |float}}
+        - service: input_number.set_value
+          data_template:
+            entity_id: >
+              {% if states('input_boolean.irrigation_cycle1_adjust_for_smartirrigation') == 'on' %}
+              input_number.irrigation_cycle1_zone2_duration
+              {% else %}
+              None
+              {% endif %}
+            value: >
+              {{ (adjusted_run_time|float * states('input_number.irrigation_zone2_percent_adjust')|float /60 /100) |float}}
+        - service: input_number.set_value
+          data_template:
+            entity_id: >
+              {% if states('input_boolean.irrigation_cycle1_adjust_for_smartirrigation') == 'on' %}
+              input_number.irrigation_cycle1_zone3_duration
+              {% else %}
+              None
+              {% endif %}
+            value: >
+              {{ (adjusted_run_time|float * states('input_number.irrigation_zone3_percent_adjust')|float /60 /100) |float}}
 
-#==== scripts
-script:
-  cycle_finished:
-    description: "Record and process when a cycle finishes"
-    fields:
-      cycle:
-        description: 'Number of the cycle that finished'
-        example: 1
-      zone:
-        description: 'Number of the zone that finished'
-        example: 1
-    mode: queued
-    sequence:
-      - service: input_datetime.set_datetime
-        data_template:
-          entity_id: input_datetime.irrigation_zone{{ zone }}_watering_finished
-          datetime: "{{ now() }}.strftime('%Y-%m-%d %H:%M:%S')"
-          # .strftime('%Y-%m-%d %H:%M:%S')
-      #=== Reset water bucket
-      - service: smart_irrigation.smart_irrigation_reset_bucket
+        ##---------------------
+        #  Cycle 2
+        ##---------------------
+        - service: input_number.set_value
+          data_template:
+            entity_id: >
+              {% if states('input_boolean.irrigation_cycle2_adjust_for_smartirrigation') == 'on' %}
+              input_number.irrigation_cycle2_zone1_duration
+              {% else %}
+              None
+              {% endif %}
+            value: >
+              {{ (adjusted_run_time|float * states('input_number.irrigation_zone1_percent_adjust')|float /60 /100) |float}}
+        - service: input_number.set_value
+          data_template:
+            entity_id: >
+              {% if states('input_boolean.irrigation_cycle2_adjust_for_smartirrigation') == 'on' %}
+              input_number.irrigation_cycle2_zone2_duration
+              {% else %}
+              None
+              {% endif %}
+            value: >
+              {{ (adjusted_run_time|float * states('input_number.irrigation_zone2_percent_adjust')|float /60 /100) |float}}
+        - service: input_number.set_value
+          data_template:
+            entity_id: >
+              {% if states('input_boolean.irrigation_cycle2_adjust_for_smartirrigation') == 'on' %}
+              input_number.irrigation_cycle2_zone3_duration
+              {% else %}
+              None
+              {% endif %}
+            value: >
+              {{ (adjusted_run_time|float * states('input_number.irrigation_zone3_percent_adjust')|float /60 /100) |float}}
 
-  update_runtimes_from_evaporation:
-    description: "Calculates the runtimes as a percentage of overall estimation."
-    fields:
-      adjusted_run_time:
-        description: Estimated run time in seconds.
-        example: 300
-    mode: queued
-    sequence:
-      # - service: logbook.log
-      #   data_template:
-      #     name: Watertime
-      #     message: "Value updated to {{ adjusted_run_time|float }} seconds from SmartIrrigation"
-      - service: input_number.set_value
-        data_template:
-          entity_id: >
-            {% if states('input_boolean.irrigation_cycle1_adjust_for_smartirrigation') == 'on' %}
-            input_number.irrigation_cycle1_zone1_duration
-            {% else %}
-            None
-            {% endif %}
-          value: >
-            {{ (adjusted_run_time|float * states('input_number.irrigation_zone1_percent_adjust')|float /60 /100) |float}}
-      - service: input_number.set_value
-        data_template:
-          entity_id: >
-            {% if states('input_boolean.irrigation_cycle1_adjust_for_smartirrigation') == 'on' %}
-            input_number.irrigation_cycle1_zone2_duration
-            {% else %}
-            None
-            {% endif %}
-          value: >
-            {{ (adjusted_run_time|float * states('input_number.irrigation_zone2_percent_adjust')|float /60 /100) |float}}
-      - service: input_number.set_value
-        data_template:
-          entity_id: >
-            {% if states('input_boolean.irrigation_cycle1_adjust_for_smartirrigation') == 'on' %}
-            input_number.irrigation_cycle1_zone3_duration
-            {% else %}
-            None
-            {% endif %}
-          value: >
-            {{ (adjusted_run_time|float * states('input_number.irrigation_zone3_percent_adjust')|float /60 /100) |float}}
+  ####################################################################################
+  # Watering totals (rain + manual use of irrigators) for zone 1 (for using as rain sensor)
+  ####################################################################################
+  sensor:
+    - platform: template
+      sensors:
+        additional_watering_total_zone1:
+          friendly_name: Sum of rain and extra irrigation from the last cycle
+          value_template: >
+            {% set precip = states('sensor.aemet_precipitation_daily')|float %}
+            {% set irrig = states('sensor.irrigation_zone1_additional_time_today')|float %}
+            {% set throughput = state_attr('sensor.smart_irrigation_base_schedule_index','throughput')[:5]|float %}
+            {% set surface = state_attr('sensor.smart_irrigation_base_schedule_index','area')[:-3]|float %}
+            {% set irrigmm = precip + irrig/60*throughput/surface  %}
+            {{ irrigmm | float}}
+          entity_id:
+            - sensor.irrigation_zone1_additional_time_today
+            - sensor.aemet_precipitation_daily
+            - sensor.aemet_precipitation
+          unit_of_measurement: 'mm'
+  #==========================================
+  #=== Zone History Sensors - from last cycle
+  #==========================================
+    - platform: history_stats_in_seconds
+      name: irrigation_zone1_additional_time_today
+      entity_id: switch.sonoff_1000cac6d4_1
+      state: 'on'
+      type: time
+      # use timestamp because problems with index aware and naive datetime formats.
+      start: >
+        {{ state_attr('input_datetime.irrigation_zone1_watering_finished','timestamp') }}
+      end: '{{ now().timestamp() }}'
 
-      ##---------------------
-      #  Cycle 2
-      ##---------------------
-      - service: input_number.set_value
-        data_template:
-          entity_id: >
-            {% if states('input_boolean.irrigation_cycle2_adjust_for_smartirrigation') == 'on' %}
-            input_number.irrigation_cycle2_zone1_duration
-            {% else %}
-            None
-            {% endif %}
-          value: >
-            {{ (adjusted_run_time|float * states('input_number.irrigation_zone1_percent_adjust')|float /60 /100) |float}}
-      - service: input_number.set_value
-        data_template:
-          entity_id: >
-            {% if states('input_boolean.irrigation_cycle2_adjust_for_smartirrigation') == 'on' %}
-            input_number.irrigation_cycle2_zone2_duration
-            {% else %}
-            None
-            {% endif %}
-          value: >
-            {{ (adjusted_run_time|float * states('input_number.irrigation_zone2_percent_adjust')|float /60 /100) |float}}
-      - service: input_number.set_value
-        data_template:
-          entity_id: >
-            {% if states('input_boolean.irrigation_cycle2_adjust_for_smartirrigation') == 'on' %}
-            input_number.irrigation_cycle2_zone3_duration
-            {% else %}
-            None
-            {% endif %}
-          value: >
-            {{ (adjusted_run_time|float * states('input_number.irrigation_zone3_percent_adjust')|float /60 /100) |float}}
-
-####################################################################################
-# Watering totals (rain + manual use of irrigators) for zone 1 (for using as rain sensor)
-####################################################################################
-sensor:
-  - platform: template
-    sensors:
-      additional_watering_total_zone1:
-        friendly_name: Sum of rain and additonal irrigation from last cycle
-        value_template: >
-          {% set precip = states('sensor.aemet_precipitation_daily')|float %}
-          {% set irrig = states('sensor.irrigation_zone1_additional_time_today')|float %}
-          {% set throughput = state_attr('sensor.smart_irrigation_base_schedule_index','throughput')[:5]|float %}
-          {% set surface = state_attr('sensor.smart_irrigation_base_schedule_index','area')[:-3]|float %}
-          {% set irrigmm = precip + irrig/60*throughput/surface  %}
-          {{ irrigmm | float}}
-        entity_id:
-          - sensor.irrigation_zone1_additional_time_today
-          - sensor.aemet_precipitation_daily
-          - sensor.aemet_precipitation
-        unit_of_measurement: 'mm'
-#==========================================
-#=== Zone History Sensors - from last cycle
-#==========================================
-  - platform: history_stats_in_seconds
-    name: irrigation_zone1_additional_time_today
-    entity_id: switch.sonoff_1000cac6d4_1
-    state: 'on'
-    type: time
-    start: >
-      {{ states('input_datetime.irrigation_zone1_watering_finished') }}+2
-    end: '{{ now() }}'
-  # - platform: history_stats
-  #   name: irrigation_zone1_additional_time_today_hours
-  #   entity_id: switch.sonoff_1000cac6d4_1
-  #   state: 'on'
-  #   type: time
-  #   start: >
-  #     {{ states('input_datetime.irrigation_zone1_watering_finished') }}+2
-  #   end: '{{ now() }}'
-
-  # - platform: template
-  #   sensors:
-  #     watering_total_zone2:
-  #       friendly_name: Sum of rain and irrigation
-  #       value_template: >
-  #         {% set precip = states('sensor.aemet_precipitation_daily')|float %}
-  #         {% set irrig = states('sensor.irrigation_zone2_total_time_today')|float %}
-  #         {% set throughput = state_attr('sensor.smart_irrigation_base_schedule_index','throughput')[:5]|float %}
-  #         {% set surface = state_attr('sensor.smart_irrigation_base_schedule_index','area')[:-3]|float %}
-  #         {% set irrigmm = precip + irrig*60*throughput/surface  %}
-  #         {{ irrigmm | float}}
-  #       entity_id:
-  #         - sensor.irrigation_zone2_total_time_today
-  #         - sensor.aemet_precipitation_daily
-  #         - sensor.aemet_precipitation
-  #       unit_of_measurement: 'mm'
-input_datetime:
-  irrigation_zone1_watering_finished:
-    name: Last time when watering finished in cycle 1 and zone 1
-    has_date: true
-    has_time: true
+    # - platform: template
+    #   sensors:
+    #     watering_total_zone2:
+    #       friendly_name: Sum of rain and irrigation
+    #       value_template: >
+    #         {% set precip = states('sensor.aemet_precipitation_daily')|float %}
+    #         {% set irrig = states('sensor.irrigation_zone2_total_time_today')|float %}
+    #         {% set throughput = state_attr('sensor.smart_irrigation_base_schedule_index','throughput')[:5]|float %}
+    #         {% set surface = state_attr('sensor.smart_irrigation_base_schedule_index','area')[:-3]|float %}
+    #         {% set irrigmm = precip + irrig*60*throughput/surface  %}
+    #         {{ irrigmm | float}}
+    #       entity_id:
+    #         - sensor.irrigation_zone2_total_time_today
+    #         - sensor.aemet_precipitation_daily
+    #         - sensor.aemet_precipitation
+    #       unit_of_measurement: 'mm'
+  input_datetime:
+    irrigation_zone1_watering_finished:
+      name: Last time when watering finished in cycle 1 and zone 1
+      has_date: true
+      has_time: true

@@ -33,12 +33,12 @@ card:
             - states['timer.irrigation_zone{{ zone }}_timer'].state
           entities:
             - input_text.irrigation_zone{{ zone }}_name
-            - input_number.irrigation_cycle{{ cycle }}_zone{{ zone }}_duration
+            - input_number.irrigation_cycle{{ cycle }}_zone{{ zone }}_duration_box
             - timer.irrigation_zone{{ zone }}_timer
           card:
             type: entities
             entities:
-              - entity: input_number.irrigation_cycle{{ cycle }}_zone{{ zone }}_duration
+              - entity: input_number.irrigation_cycle{{ cycle }}_zone{{ zone }}_duration_box
                 name: "${ vars[0] }"
                 icon: "${ vars[2] === 'active' ? 'mdi:sprinkler-variant' : '' }"
                 tap_action:
